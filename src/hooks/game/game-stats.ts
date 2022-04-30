@@ -68,6 +68,12 @@ const MainStatsProps = Vue.extend({
                     <div></div>
                 </div>
             </template>
+            <template v-if="jail_info.count >= 0">
+                <div class=_round>
+                    <div>{{ jail_info.count }}</div>
+                    <div>броск{{ jail_info.case }} в тюрьме</div>
+                </div>
+            </template>
         </div>
     </div>
     `
@@ -160,6 +166,23 @@ class MainStats extends MainStatsProps {
             return { time_mod, time_mod_value, game_time: window.parsers.parseTimeToString(mods.time - this.vm_time.time_ingame), time: mods.time };
         }
         return {};
+    }
+
+    // Если игрок в тюрьме, то вернет кол-во бросков в тюрьме, иначе -1
+    get jail_info() {
+      // Все игроки
+      const players = this.state.storage.players;
+
+      // Текущий игрок
+      if (!players.has(window.API.user.user_id)) {
+          return { count: -1, case: "" };
+      }
+
+      const player = players.get(window.API.user.user_id);
+
+      // Состояние в тюрьме
+      const jail = player.jailed ? player.unjailAttempts : -1;
+      return { count: jail, case: window.Tools.selectWordCase(jail, ["ок", "ка", "ов"]) };
     }
 }
 

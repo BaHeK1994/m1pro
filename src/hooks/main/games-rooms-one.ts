@@ -11,6 +11,7 @@ declare module 'vue/types/vue' {
         parent_type: string
         room: GameRoom
         players_all: Set<number>
+        players: any
         slots: Array<GameSlot>
     }
 }

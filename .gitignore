@@ -1,4 +1,5 @@
 node_modules
 .idea
 .vscode
-dist
+dist/*
+!dist/m1pro.prod.user.js

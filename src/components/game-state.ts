@@ -8,7 +8,7 @@ import extend from "lodash/extend";
 
 class GameSettings {
     splitCommonStats = true;
-    changeColor = true;
+    changeColor = false;
     showLiveContracts = true;
 }
 

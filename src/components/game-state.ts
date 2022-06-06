@@ -288,6 +288,11 @@ export default class GameState extends Vue {
         packet.msg.events?.forEach(event => {
             const pl = this.players.find(pl => pl.user_id === event.user_id);
             switch (event.type) {
+                case 'restart':
+                    this.$emit('restart');
+                    this.restartChancePool();
+                    break;
+
                 case 'busStopChoosed':
                     current && (this.lastBusUserId = event.user_id)
                 case 'fieldToMoveChoosed':
@@ -403,12 +408,12 @@ export default class GameState extends Vue {
                     } else {
                         this.oldChancePool[event.chance_id].out = true;
                         if (this.oldChancePool.filter(oc => !oc.out).length === 0) {
-                            this.oldChancePool.forEach(oc => oc.out = false);
+                            this.restartChancePool();
                         }
                     }
 
                     const type = chanceCard.type;
-                    debug('chance', type, packet.msg.id)
+                    debug('chance', type, packet.msg.id, event.chance_id)
                     switch (type) {
                         case 'cash_in':
                             pl.income += event.money ?? event.sum ?? 0;
@@ -433,6 +438,10 @@ export default class GameState extends Vue {
                     break;
             }
         })
+    }
+
+    private restartChancePool() {
+        this.oldChancePool.forEach(oc => oc.out = false);
     }
 
     private checkRoll(roll: PacketPlayerEvents, packet: Packet) {

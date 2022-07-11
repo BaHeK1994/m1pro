@@ -55,7 +55,7 @@ class PacketPlayerEvents {
     lastDiceEvent: GameEvent = null;
 
     getLastPosition() {
-        const last = [...this.events].reverse().find(e => e.field_id !== undefined || e.mean_position !== undefined);
+        const last = [...this.events].reverse().find(e => e.field_id !== undefined || (e.mean_position !== undefined && e.type !== 'chance'));
         return last.mean_position ?? last.field_id;
     }
 }
@@ -138,6 +138,7 @@ export default class GameState extends Vue {
     settings: GameSettings = null;
     lastBusUserId = 0;
     currentTeleports = new Array<GameEvent>();
+    currentChooses = new Array<GameEvent>();
     pendingLastReverseMoveRounds: { [key: string]: number } = {};
     pendingLastSkipMoveRounds: { [key: string]: number } = {};
     lastReverseMoveRounds: { [key: string]: number } = {};
@@ -148,7 +149,6 @@ export default class GameState extends Vue {
     pendingChancePool = new Array<number>();
     pendingChancesToRemove = new Array<number>();
     currentChanceCards = new Array<CurrentChanceCard>();
-    comboJails = 0;
     currentEvents = new PacketPlayerEvents();
     demoEvents = new PacketPlayerEvents();
     wormholeDestinations = new Array<number>();
@@ -287,6 +287,7 @@ export default class GameState extends Vue {
         let ctrRes = 0;
         packet.msg.events?.forEach(event => {
             const pl = this.players.find(pl => pl.user_id === event.user_id);
+            const spl = this.storage.status.players.find(spl => spl.user_id === event.user_id);
             switch (event.type) {
                 case 'restart':
                     this.$emit('restart');
@@ -294,9 +295,10 @@ export default class GameState extends Vue {
                     break;
 
                 case 'busStopChoosed':
-                    current && (this.lastBusUserId = event.user_id)
+                    current && (this.lastBusUserId = event.user_id, this.currentChooses.push(event));
                 case 'fieldToMoveChoosed':
                     roll.events.push(event);
+                    current && this.currentChooses.push(event);
                     break;
                 case 'unjailedByFee':
                     roll.events.push(event);
@@ -306,16 +308,23 @@ export default class GameState extends Vue {
                     if (!packet.no_events) {
                         roll.events.push(event);
                         roll.lastDiceEvent = event;
+                        if (spl.doublesRolledAsCombo > 0 && !this.isLastDiceRollDouble(roll)) {
+                            jQuery(pl.token).find('div._cntr').hide();
+                        }
                     }
                     break;
                 case 'gameOver':
                     this.gameOver = true;
                     break;
                 case 'goToJailByCombo':
-                    this.comboJails++;
+                    roll.events.push(event);
                     break;
                 case 'double_spended':
                     roll.doubleSpent = true;
+                    break;
+                case 'rollDicesForUnjailSuccess':
+                    roll.events.push(event);
+                    jQuery(pl.token).find('div._cntr').hide();
                     break;
 
                 case 'startBypass':
@@ -395,6 +404,7 @@ export default class GameState extends Vue {
                     break;
 
                 case 'chance':
+                    roll.events.push(event);
                     const chanceCard = this.storage.config.chance_cards[event.chance_id];
 
                     if (current) {
@@ -476,7 +486,8 @@ export default class GameState extends Vue {
 
     private getCurrentRound(packet: Packet, userId: number) {
         const packetRound = packet.msg.status.round;
-        if (this.players.findIndex(pl => pl.user_id === userId) === this.players.length - 1 && packet.msg.status.action_player !== userId) {
+        const playersLeft = this.storage.status.players.filter(spl => spl.status !== -1);
+        if (playersLeft.findIndex(pl => pl.user_id === userId) === playersLeft.length - 1 && packet.msg.status.action_player !== userId) {
             return packetRound - 1;
         } else {
             return packetRound;
@@ -490,13 +501,18 @@ export default class GameState extends Vue {
     }
 
     private isMoveSkipApplied(roll: PacketPlayerEvents, current: boolean) {
+        const diceRollDouble = this.isLastDiceRollDouble(roll);
+        const res = (current || (this.storage.status.round - roll.round) < 1) && (!diceRollDouble || roll.doubleSpent);
+        debug(`isMoveSkipApplied===${res}`, current, this.storage.status.round - roll.round, diceRollDouble, roll);
+        return res;
+    }
+
+    private isLastDiceRollDouble(roll: PacketPlayerEvents) {
         const dices = roll.lastDiceEvent?.dices;
         const diceRollTriple = (dices?.length === 3 && dices[0] < 4 && dices[0] === dices[1] && dices[0] === dices[2]);
         const diceRollDouble = (dices?.length === 2 && dices[0] === dices[1]) ||
             (dices?.length === 3 && dices[0] === dices[1] && !diceRollTriple);
-        const res = (current || (this.storage.status.round - roll.round) < 1) && (!diceRollDouble || roll.doubleSpent);
-        debug(`isMoveSkipApplied===${res}`, current, this.storage.status.round - roll.round, diceRollDouble, diceRollTriple, roll);
-        return res;
+        return diceRollDouble;
     }
 
     public loadDemo(id?: number, tries = 0): JQueryPromise<Array<UpdateAction>> {

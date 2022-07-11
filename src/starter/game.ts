@@ -1,9 +1,10 @@
-import { FieldActions, GameStats, PlayerCardMenu, PlayerCards, PlayerColors, ShowFieldMove, TableContract, ShowChanceCard, TableAction, LockableFields } from '../hooks/game';
+import { FieldActions, GameStats, PlayerCardMenu, PlayerCards, PlayerColors, ShowFieldMove, TableContract, ShowChanceCard, TableAction, LockableFields, TableChat } from '../hooks/game';
 import vooker from '../util/vue-hooker';
 import Vue from 'vue';
 import { debug } from '../util/debug';
 import GameState from '../components/game-state';
 import { expgame } from '../hooks/experimental/expgame';
+import initAnalytics from './analytics';
 
 export const gameStarter = () => {
     debug('M1Pro game boot');
@@ -30,6 +31,11 @@ export const gameStarter = () => {
         new ShowFieldMove(v, state);
         new ShowChanceCard(v, state);
         new LockableFields(state);
+        new TableChat(state);
+
+        window.onReadyToUse(() => {
+            initAnalytics();
+        });
     });
     expgame(state);
     debug('M1Pro game boot done');

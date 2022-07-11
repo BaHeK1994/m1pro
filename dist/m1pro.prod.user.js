@@ -6,7 +6,7 @@
               // ==UserScript==
 // @name        m1pro
 // @namespace   https://alexdymov.github.io/m1pro
-// @version     1.0.0
+// @version     1.0.1
 // @author      Smoke <alex.dymov@gmail.com>
 // @source      https://github.com/alexdymov/m1pro
 // @match       https://monopoly-one.com/*
@@ -4913,7 +4913,7 @@ var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBP
 var ___CSS_LOADER_URL_REPLACEMENT_0___ = _node_modules_css_loader_dist_runtime_getUrl_js__WEBPACK_IMPORTED_MODULE_2___default()(___CSS_LOADER_URL_IMPORT_0___);
 var ___CSS_LOADER_URL_REPLACEMENT_1___ = _node_modules_css_loader_dist_runtime_getUrl_js__WEBPACK_IMPORTED_MODULE_2___default()(___CSS_LOADER_URL_IMPORT_1___);
 // Module
-___CSS_LOADER_EXPORT___.push([module.id, ".table-body-board-tokens > div {\n  display: flex;\n  align-items: center;\n  justify-content: center;\n  font-size: 15pt;\n}\n.table-body-board-tokens > div > div {\n  background-position: center;\n  background-repeat: no-repeat;\n  background-size: contain;\n  width: 20px;\n  height: 20px;\n}\n.table-body-board-tokens > div > ._skip {\n  background-image: url(" + ___CSS_LOADER_URL_REPLACEMENT_0___ + ");\n}\n.table-body-board-tokens > div > ._back {\n  background-image: url(" + ___CSS_LOADER_URL_REPLACEMENT_1___ + ");\n}\n", ""]);
+___CSS_LOADER_EXPORT___.push([module.id, ".table-body-board-tokens > div {\n  display: flex;\n  align-items: center;\n  justify-content: center;\n  font-size: 15pt;\n}\n.table-body-board-tokens > div > div {\n  background-position: center;\n  background-repeat: no-repeat;\n  background-size: contain;\n  width: 20px;\n  height: 20px;\n}\n.table-body-board-tokens > div > ._skip {\n  background-image: url(" + ___CSS_LOADER_URL_REPLACEMENT_0___ + ");\n}\n.table-body-board-tokens > div > ._back {\n  background-image: url(" + ___CSS_LOADER_URL_REPLACEMENT_1___ + ");\n}\n.table-body-board-tokens > div > ._cntr {\n  text-align: center;\n  font: 20px Arvo;\n  margin-top: -4px;\n}\n.table-body-board-tokens > div > ._cntr[mnpl-jailed=\"0\"] {\n  margin-top: -5px;\n}\n", ""]);
 // Exports
 /* harmony default export */ __webpack_exports__["Z"] = (___CSS_LOADER_EXPORT___);
 
@@ -4998,7 +4998,7 @@ var ___CSS_LOADER_URL_IMPORT_0___ = new URL(/* asset import */ __webpack_require
 var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_1___default()((_node_modules_css_loader_dist_runtime_noSourceMaps_js__WEBPACK_IMPORTED_MODULE_0___default()));
 var ___CSS_LOADER_URL_REPLACEMENT_0___ = _node_modules_css_loader_dist_runtime_getUrl_js__WEBPACK_IMPORTED_MODULE_2___default()(___CSS_LOADER_URL_IMPORT_0___);
 // Module
-___CSS_LOADER_EXPORT___.push([module.id, ".Info-wrap {\n  border-radius: 5px;\n  display: flex;\n  flex-flow: row nowrap;\n  justify-items: center;\n}\nbody[theme=\"dark\"] .Info-wrap {\n  background-color: #25262b;\n}\nbody:not([theme]) .Info-wrap {\n  background-color: #fff;\n}\n.Info-pages {\n  border-radius: 5px 0 0 5px;\n  padding: 20px;\n  width: 190px;\n}\nbody[theme=\"dark\"] .Info-pages {\n  background-color: #2e3036;\n}\nbody:not([theme]) .Info-pages {\n  background-color: #f7f7f7;\n}\n.Info-pages > div {\n  margin-bottom: 5px;\n  border-radius: 5px;\n  height: 148px;\n  background-size: 128px;\n  background-repeat: no-repeat;\n  background-position: center center;\n}\n.Info-pages > div:hover {\n  cursor: pointer;\n}\n.Info-pages > div.selected {\n  background-color: #8cc152;\n}\nbody[theme=\"dark\"] .Info-pages > div:not(.selected):hover {\n  background-color: rgba(255, 255, 255, 0.067);\n}\nbody:not([theme]) .Info-pages > div:not(.selected):hover {\n  background-color: rgba(0, 0, 0, 0.04);\n}\n.Info-pages .Info-btn-main {\n  display: flex;\n  align-items: center;\n  justify-content: center;\n}\n.Info-pages .Info-btn-pro {\n  position: relative;\n  background-image: url(" + ___CSS_LOADER_URL_REPLACEMENT_0___ + ");\n}\n.Info-pages .Info-btn-pro .badge {\n  display: none;\n  position: absolute;\n  bottom: 5px;\n  right: 5px;\n}\n.Info-pro-history h1 {\n  margin: 20px 0;\n}\n.Info-pro-history p {\n  line-height: 1.4;\n}\n.Info-pro-history .newver:after {\n  content: \"NEW!\";\n  color: red;\n  font-size: 10px;\n  margin-left: 5px;\n  vertical-align: text-top;\n}\n.Info-pro-history blockquote {\n  display: none;\n  padding: 5px;\n  margin: 0 0 0 20px !important;\n}\n.Info-pro-history blockquote > p {\n  margin: 0 !important;\n}\n.Info-pro-history blockquote > ul,\n.Info-pro-history blockquote ol {\n  margin: 0 0 0 20px !important;\n}\n.Info-pro-history li {\n  padding-left: 0 !important;\n  margin: 5px 0 !important;\n}\n.Info-pro-history li > * {\n  text-indent: initial;\n}\n.Info-pro-history .info-icon {\n  font-size: 18px;\n  margin: 4px;\n}\n.Info-content > div {\n  width: 500px;\n  height: 585px;\n  overflow-y: auto;\n}\n.Info-content > div:not(.selected) {\n  display: none;\n}\nbody[theme=\"dark\"] .Info-content > div {\n  box-shadow: 0 0 25px rgba(0, 0, 0, 0.33);\n}\nbody:not([theme]) .Info-content > div {\n  box-shadow: 0 0 25px rgba(0, 0, 0, 0.1);\n}\n.Info-pro {\n  padding: 20px;\n}\n.Info-main {\n  display: grid;\n}\n.Info-main > div:nth-child(1) {\n  grid-column-start: 1;\n  grid-column-end: 3;\n}\n.Info-main > div:nth-child(2),\n.Info-main > div:nth-child(3) {\n  grid-row: 2;\n}\n.Info-main > div:nth-child(4) {\n  grid-row: 3;\n  grid-column-start: 1;\n  grid-column-end: 3;\n}\n.Info-main .footer-icons a {\n  border: none !important;\n}\n.Info-main .footer-icons .footer-icons-one {\n  margin-right: 10px;\n  height: 25px;\n  opacity: 0.66;\n}\n.Info-main .footer-left .footer-left-logo {\n  display: none;\n}\n", ""]);
+___CSS_LOADER_EXPORT___.push([module.id, ".Info-wrap {\n  border-radius: 5px;\n  display: flex;\n  flex-flow: row nowrap;\n  justify-items: center;\n}\nbody[theme=\"dark\"] .Info-wrap {\n  background-color: #25262b;\n}\nbody:not([theme]) .Info-wrap {\n  background-color: #fff;\n}\n.Info-pages {\n  border-radius: 5px 0 0 5px;\n  padding: 20px;\n  width: 190px;\n}\nbody[theme=\"dark\"] .Info-pages {\n  background-color: #2e3036;\n}\nbody:not([theme]) .Info-pages {\n  background-color: #f7f7f7;\n}\n.Info-pages > div {\n  margin-bottom: 5px;\n  border-radius: 5px;\n  height: 148px;\n  background-size: 128px;\n  background-repeat: no-repeat;\n  background-position: center center;\n}\n.Info-pages > div:hover {\n  cursor: pointer;\n}\n.Info-pages > div.selected {\n  background-color: #8cc152;\n}\nbody[theme=\"dark\"] .Info-pages > div:not(.selected):hover {\n  background-color: rgba(255, 255, 255, 0.067);\n}\nbody:not([theme]) .Info-pages > div:not(.selected):hover {\n  background-color: rgba(0, 0, 0, 0.04);\n}\n.Info-pages .Info-btn-main {\n  display: flex;\n  align-items: center;\n  justify-content: center;\n}\n.Info-pages .Info-btn-pro {\n  position: relative;\n  background-image: url(" + ___CSS_LOADER_URL_REPLACEMENT_0___ + ");\n}\n.Info-pages .Info-btn-pro .badge {\n  display: none;\n  position: absolute;\n  bottom: 5px;\n  right: 5px;\n}\n.Info-pro-general ._community {\n  display: flex;\n  align-items: center;\n}\n.Info-pro-general ._community a {\n  text-decoration: none;\n}\n.Info-pro-donations > div .title {\n  text-align: center;\n}\n.Info-pro-donations > div .buttons {\n  text-align: center;\n}\n.Info-pro-donations > div > div {\n  display: flex;\n  flex-direction: column;\n}\n.Info-pro-donations > div > div:first-child div {\n  align-self: center;\n}\n.Info-pro-donations > div input[type=\"number\"] {\n  width: 85px;\n}\n.Info-pro-donations > div input[type=\"text\"] {\n  width: 150px;\n}\n.Info-pro-donations > div input[type=\"radio\"] {\n  visibility: hidden;\n  position: absolute;\n}\n.Info-pro-donations > div .yoo-controls {\n  display: flex;\n  align-content: center;\n}\n.Info-pro-donations > div .yoo-controls > input {\n  margin-right: 5px;\n}\n.Info-pro-donations > div .yoo-controls button {\n  max-height: 35px !important;\n  height: 35px !important;\n}\n.Info-pro-donations > div .yoo-controls button._selected {\n  background: #8cc152 !important;\n}\n.Info-pro-donations > div .yoo-controls label:first-of-type button {\n  border-top-right-radius: unset !important;\n  border-bottom-right-radius: unset !important;\n}\n.Info-pro-donations > div .yoo-controls label:last-of-type button {\n  border-top-left-radius: unset !important;\n  border-bottom-left-radius: unset !important;\n}\n.Info-pro-donations > div .yoo-icon {\n  background-size: contain;\n  vertical-align: middle;\n  position: relative;\n  top: -1px;\n}\n.Info-pro-donations > div .yoo-icon-purse {\n  background-image: url(https://static.yoomoney.ru/makeupd/_/sqJ2MGna3IZGNFXC9k4QOrzUG-c.svg);\n  width: 16px;\n  height: 21px;\n}\n.Info-pro-donations > div .yoo-icon-card {\n  background-image: url(https://static.yoomoney.ru/makeupd/_/KIvuZ8T0mHJKws1zGyf3gU47ivc.svg);\n  width: 19px;\n  height: 20px;\n}\n.Info-pro-history h1 {\n  margin: 20px 0;\n}\n.Info-pro-history p {\n  line-height: 1.4;\n}\n.Info-pro-history .newver:after {\n  content: \"NEW!\";\n  color: red;\n  font-size: 10px;\n  margin-left: 5px;\n  vertical-align: text-top;\n}\n.Info-pro-history blockquote {\n  display: none;\n  padding: 5px;\n  margin: 0 0 0 20px !important;\n}\n.Info-pro-history blockquote > p {\n  margin: 0 !important;\n}\n.Info-pro-history blockquote > ul,\n.Info-pro-history blockquote ol {\n  margin: 0 0 0 20px !important;\n}\n.Info-pro-history li {\n  padding-left: 0 !important;\n  margin: 5px 0 !important;\n}\n.Info-pro-history li > * {\n  text-indent: initial;\n}\n.Info-pro-history .info-icon {\n  font-size: 18px;\n  margin: 4px;\n}\n.Info-content > div {\n  width: 500px;\n  height: 585px;\n  overflow-y: auto;\n}\n.Info-content > div:not(.selected) {\n  display: none;\n}\nbody[theme=\"dark\"] .Info-content > div {\n  box-shadow: 0 0 25px rgba(0, 0, 0, 0.33);\n}\nbody:not([theme]) .Info-content > div {\n  box-shadow: 0 0 25px rgba(0, 0, 0, 0.1);\n}\n.Info-pro {\n  padding: 20px;\n}\n.Info-main {\n  display: grid;\n}\n.Info-main > div:nth-child(1) {\n  grid-column-start: 1;\n  grid-column-end: 3;\n}\n.Info-main > div:nth-child(2),\n.Info-main > div:nth-child(3) {\n  grid-row: 2;\n}\n.Info-main > div:nth-child(4) {\n  grid-row: 3;\n  grid-column-start: 1;\n  grid-column-end: 3;\n}\n.Info-main .footer-icons a {\n  border: none !important;\n}\n.Info-main .footer-icons .footer-icons-one {\n  margin-right: 10px;\n  height: 25px;\n  opacity: 0.66;\n}\n.Info-main .footer-left .footer-left-logo {\n  display: none;\n}\n", ""]);
 // Exports
 /* harmony default export */ __webpack_exports__["Z"] = (___CSS_LOADER_EXPORT___);
 
@@ -5024,6 +5024,31 @@ var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBP
 var ___CSS_LOADER_URL_REPLACEMENT_0___ = _node_modules_css_loader_dist_runtime_getUrl_js__WEBPACK_IMPORTED_MODULE_2___default()(___CSS_LOADER_URL_IMPORT_0___);
 // Module
 ___CSS_LOADER_EXPORT___.push([module.id, ":root {\n  --base-menu-width: 75px;\n  --statsable-padding-top: 25px;\n  --user_red: #cd3747;\n  --user_green: #66b343;\n  --user_blue: #54c9f0;\n  --user_purple: #a17fef;\n  --user_yellow: #d98942;\n  --slot_red: linear-gradient(45deg, var(--user_red), #f26b61);\n  --slot_green: linear-gradient(45deg, var(--user_green), #b0e372);\n  --slot_blue: linear-gradient(45deg, var(--user_blue), #2191e1);\n  --slot_purple: linear-gradient(45deg, var(--user_purple), #d188e3);\n  --slot_yellow: linear-gradient(45deg, var(--user_yellow), #d9b444);\n}\nhtml {\n  height: 100%;\n}\nbody {\n  min-height: 100%;\n  padding: 15px 0 15px calc(var(--base-menu-width) + 25px) !important;\n}\nbody > .container,\nbody > .widther {\n  height: 100%;\n  padding-right: 25px !important;\n}\nbody > .widther {\n  margin-top: 0 !important;\n}\n.footer {\n  display: none;\n}\n.widther {\n  width: unset !important;\n}\ndiv.IM {\n  padding-top: 0 !important;\n}\n.bigboard {\n  min-height: 980px !important;\n}\n.widther.main-section-love,\n.widther.index-letsplay {\n  height: unset !important;\n}\n.mfp {\n  background-image: url(" + ___CSS_LOADER_URL_REPLACEMENT_0___ + ");\n}\n.nc {\n  top: 75px !important;\n}\n", ""]);
+// Exports
+/* harmony default export */ __webpack_exports__["Z"] = (___CSS_LOADER_EXPORT___);
+
+
+/***/ }),
+
+/***/ "./node_modules/css-loader/dist/cjs.js!./node_modules/less-loader/dist/cjs.js!./src/style/main/banner.less":
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony import */ var _node_modules_css_loader_dist_runtime_noSourceMaps_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__("./node_modules/css-loader/dist/runtime/noSourceMaps.js");
+/* harmony import */ var _node_modules_css_loader_dist_runtime_noSourceMaps_js__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_node_modules_css_loader_dist_runtime_noSourceMaps_js__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__("./node_modules/css-loader/dist/runtime/api.js");
+/* harmony import */ var _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(_node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_1__);
+/* harmony import */ var _node_modules_css_loader_dist_runtime_getUrl_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__("./node_modules/css-loader/dist/runtime/getUrl.js");
+/* harmony import */ var _node_modules_css_loader_dist_runtime_getUrl_js__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(_node_modules_css_loader_dist_runtime_getUrl_js__WEBPACK_IMPORTED_MODULE_2__);
+// Imports
+
+
+
+var ___CSS_LOADER_URL_IMPORT_0___ = new URL(/* asset import */ __webpack_require__("./assets/images/icon128.png"), __webpack_require__.b);
+var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_1___default()((_node_modules_css_loader_dist_runtime_noSourceMaps_js__WEBPACK_IMPORTED_MODULE_0___default()));
+var ___CSS_LOADER_URL_REPLACEMENT_0___ = _node_modules_css_loader_dist_runtime_getUrl_js__WEBPACK_IMPORTED_MODULE_2___default()(___CSS_LOADER_URL_IMPORT_0___);
+// Module
+___CSS_LOADER_EXPORT___.push([module.id, ".games-market-list-one._m1pro .games-market-list-one-more-image {\n  width: 128px;\n  background: center / contain no-repeat;\n  background-image: url(" + ___CSS_LOADER_URL_REPLACEMENT_0___ + ");\n}\n.games-market-list-one._m1pro .games-market-list-one-more-button-custom {\n  display: flex;\n  flex-direction: column;\n  row-gap: 5px;\n  justify-content: center;\n  margin-left: 25px;\n  flex: 1 1 auto;\n  text-align: center;\n}\n.games-market-dots ._m1pro {\n  background-color: crimson !important;\n}\n", ""]);
 // Exports
 /* harmony default export */ __webpack_exports__["Z"] = (___CSS_LOADER_EXPORT___);
 
@@ -5856,6 +5881,55 @@ var update = _node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js
 
 
        /* harmony default export */ __webpack_exports__["default"] = (_node_modules_css_loader_dist_cjs_js_node_modules_less_loader_dist_cjs_js_table_contract_less__WEBPACK_IMPORTED_MODULE_6__/* ["default"] */ .Z && _node_modules_css_loader_dist_cjs_js_node_modules_less_loader_dist_cjs_js_table_contract_less__WEBPACK_IMPORTED_MODULE_6__/* ["default"].locals */ .Z.locals ? _node_modules_css_loader_dist_cjs_js_node_modules_less_loader_dist_cjs_js_table_contract_less__WEBPACK_IMPORTED_MODULE_6__/* ["default"].locals */ .Z.locals : undefined);
+
+
+/***/ }),
+
+/***/ "./src/style/main/banner.less":
+/***/ (function(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__("./node_modules/style-loader/dist/runtime/injectStylesIntoStyleTag.js");
+/* harmony import */ var _node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var _node_modules_style_loader_dist_runtime_styleDomAPI_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__("./node_modules/style-loader/dist/runtime/styleDomAPI.js");
+/* harmony import */ var _node_modules_style_loader_dist_runtime_styleDomAPI_js__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(_node_modules_style_loader_dist_runtime_styleDomAPI_js__WEBPACK_IMPORTED_MODULE_1__);
+/* harmony import */ var _node_modules_style_loader_dist_runtime_insertBySelector_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__("./node_modules/style-loader/dist/runtime/insertBySelector.js");
+/* harmony import */ var _node_modules_style_loader_dist_runtime_insertBySelector_js__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(_node_modules_style_loader_dist_runtime_insertBySelector_js__WEBPACK_IMPORTED_MODULE_2__);
+/* harmony import */ var _node_modules_style_loader_dist_runtime_setAttributesWithoutAttributes_js__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__("./node_modules/style-loader/dist/runtime/setAttributesWithoutAttributes.js");
+/* harmony import */ var _node_modules_style_loader_dist_runtime_setAttributesWithoutAttributes_js__WEBPACK_IMPORTED_MODULE_3___default = /*#__PURE__*/__webpack_require__.n(_node_modules_style_loader_dist_runtime_setAttributesWithoutAttributes_js__WEBPACK_IMPORTED_MODULE_3__);
+/* harmony import */ var _node_modules_style_loader_dist_runtime_insertStyleElement_js__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__("./node_modules/style-loader/dist/runtime/insertStyleElement.js");
+/* harmony import */ var _node_modules_style_loader_dist_runtime_insertStyleElement_js__WEBPACK_IMPORTED_MODULE_4___default = /*#__PURE__*/__webpack_require__.n(_node_modules_style_loader_dist_runtime_insertStyleElement_js__WEBPACK_IMPORTED_MODULE_4__);
+/* harmony import */ var _node_modules_style_loader_dist_runtime_styleTagTransform_js__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__("./node_modules/style-loader/dist/runtime/styleTagTransform.js");
+/* harmony import */ var _node_modules_style_loader_dist_runtime_styleTagTransform_js__WEBPACK_IMPORTED_MODULE_5___default = /*#__PURE__*/__webpack_require__.n(_node_modules_style_loader_dist_runtime_styleTagTransform_js__WEBPACK_IMPORTED_MODULE_5__);
+/* harmony import */ var _node_modules_css_loader_dist_cjs_js_node_modules_less_loader_dist_cjs_js_banner_less__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__("./node_modules/css-loader/dist/cjs.js!./node_modules/less-loader/dist/cjs.js!./src/style/main/banner.less");
+
+      
+      
+      
+      
+      
+      
+      
+      
+      
+
+var options = {};
+
+options.styleTagTransform = (_node_modules_style_loader_dist_runtime_styleTagTransform_js__WEBPACK_IMPORTED_MODULE_5___default());
+options.setAttributes = (_node_modules_style_loader_dist_runtime_setAttributesWithoutAttributes_js__WEBPACK_IMPORTED_MODULE_3___default());
+
+      options.insert = _node_modules_style_loader_dist_runtime_insertBySelector_js__WEBPACK_IMPORTED_MODULE_2___default().bind(null, "head");
+    
+options.domAPI = (_node_modules_style_loader_dist_runtime_styleDomAPI_js__WEBPACK_IMPORTED_MODULE_1___default());
+options.insertStyleElement = (_node_modules_style_loader_dist_runtime_insertStyleElement_js__WEBPACK_IMPORTED_MODULE_4___default());
+
+var update = _node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js__WEBPACK_IMPORTED_MODULE_0___default()(_node_modules_css_loader_dist_cjs_js_node_modules_less_loader_dist_cjs_js_banner_less__WEBPACK_IMPORTED_MODULE_6__/* ["default"] */ .Z, options);
+
+
+
+
+       /* harmony default export */ __webpack_exports__["default"] = (_node_modules_css_loader_dist_cjs_js_node_modules_less_loader_dist_cjs_js_banner_less__WEBPACK_IMPORTED_MODULE_6__/* ["default"] */ .Z && _node_modules_css_loader_dist_cjs_js_node_modules_less_loader_dist_cjs_js_banner_less__WEBPACK_IMPORTED_MODULE_6__/* ["default"].locals */ .Z.locals ? _node_modules_css_loader_dist_cjs_js_node_modules_less_loader_dist_cjs_js_banner_less__WEBPACK_IMPORTED_MODULE_6__/* ["default"].locals */ .Z.locals : undefined);
 
 
 /***/ }),
@@ -7976,7 +8050,7 @@ class PacketPlayerEvents {
     }
     getLastPosition() {
         var _a;
-        const last = [...this.events].reverse().find(e => e.field_id !== undefined || e.mean_position !== undefined);
+        const last = [...this.events].reverse().find(e => e.field_id !== undefined || (e.mean_position !== undefined && e.type !== 'chance'));
         return (_a = last.mean_position) !== null && _a !== void 0 ? _a : last.field_id;
     }
 }
@@ -8004,6 +8078,7 @@ let GameState = class GameState extends (external_Vue_default()) {
         this.settings = null;
         this.lastBusUserId = 0;
         this.currentTeleports = new Array();
+        this.currentChooses = new Array();
         this.pendingLastReverseMoveRounds = {};
         this.pendingLastSkipMoveRounds = {};
         this.lastReverseMoveRounds = {};
@@ -8014,7 +8089,6 @@ let GameState = class GameState extends (external_Vue_default()) {
         this.pendingChancePool = new Array();
         this.pendingChancesToRemove = new Array();
         this.currentChanceCards = new Array();
-        this.comboJails = 0;
         this.currentEvents = new PacketPlayerEvents();
         this.demoEvents = new PacketPlayerEvents();
         this.wormholeDestinations = new Array();
@@ -8151,33 +8225,45 @@ let GameState = class GameState extends (external_Vue_default()) {
         packet.msg.status && this.checkRoll(roll, packet);
         let ctrRes = 0;
         (_a = packet.msg.events) === null || _a === void 0 ? void 0 : _a.forEach(event => {
-            var _a, _b, _c, _d, _e, _f, _g;
+            var _a, _b, _c, _d, _e, _f, _g, _h, _j;
             const pl = this.players.find(pl => pl.user_id === event.user_id);
+            const spl = this.storage.status.players.find(spl => spl.user_id === event.user_id);
             switch (event.type) {
                 case 'restart':
                     this.$emit('restart');
                     this.restartChancePool();
                     break;
                 case 'busStopChoosed':
-                    current && (this.lastBusUserId = event.user_id);
+                    current && (this.lastBusUserId = event.user_id, this.currentChooses.push(event));
                 case 'fieldToMoveChoosed':
+                    roll.events.push(event);
+                    current && this.currentChooses.push(event);
+                    break;
                 case 'unjailedByFee':
                     roll.events.push(event);
+                    pl.expenses += (_b = (_a = event.money) !== null && _a !== void 0 ? _a : event.sum) !== null && _b !== void 0 ? _b : 0;
                     break;
                 case 'rollDices':
                     if (!packet.no_events) {
                         roll.events.push(event);
                         roll.lastDiceEvent = event;
+                        if (spl.doublesRolledAsCombo > 0 && !this.isLastDiceRollDouble(roll)) {
+                            jQuery(pl.token).find('div._cntr').hide();
+                        }
                     }
                     break;
                 case 'gameOver':
                     this.gameOver = true;
                     break;
                 case 'goToJailByCombo':
-                    this.comboJails++;
+                    roll.events.push(event);
                     break;
                 case 'double_spended':
                     roll.doubleSpent = true;
+                    break;
+                case 'rollDicesForUnjailSuccess':
+                    roll.events.push(event);
+                    jQuery(pl.token).find('div._cntr').hide();
                     break;
                 case 'startBypass':
                     pl.laps++;
@@ -8188,7 +8274,7 @@ let GameState = class GameState extends (external_Vue_default()) {
                 case 'russianRoulette_alive':
                 case 'cash_plus':
                 case 'credit_taken':
-                    pl.income += (_b = (_a = event.money) !== null && _a !== void 0 ? _a : event.sum) !== null && _b !== void 0 ? _b : 0;
+                    pl.income += (_d = (_c = event.money) !== null && _c !== void 0 ? _c : event.sum) !== null && _d !== void 0 ? _d : 0;
                     break;
                 case 'startBypassFeePaid':
                     pl.laps++;
@@ -8197,9 +8283,8 @@ let GameState = class GameState extends (external_Vue_default()) {
                 case 'jackpot_lose':
                 case 'jackpot_superprize_funded':
                 case 'jackpot_paid':
-                case 'unjailedByFee':
                 case 'russianRoulette_process':
-                    pl.expenses += (_d = (_c = event.money) !== null && _c !== void 0 ? _c : event.sum) !== null && _d !== void 0 ? _d : 0;
+                    pl.expenses += (_f = (_e = event.money) !== null && _e !== void 0 ? _e : event.sum) !== null && _f !== void 0 ? _f : 0;
                     break;
                 case 'wormhole_opened':
                     pl.expenses += this.storage.config.WORMHOLE_EXTRA_DESTINATION_COST * (event.destinations_count - WORMHOLE_DEFAULT_FREE_DESTINATIONS);
@@ -8257,9 +8342,10 @@ let GameState = class GameState extends (external_Vue_default()) {
                     this.ongoingContract = null;
                     break;
                 case 'chance':
+                    roll.events.push(event);
                     const chanceCard = this.storage.config.chance_cards[event.chance_id];
                     if (current) {
-                        this.currentChanceCards.push(new CurrentChanceCard(teleport ? teleport.mean_position : this.currentEvents.getLastPosition(), chanceCard, event.user_id, (_e = event.money) !== null && _e !== void 0 ? _e : event.sum));
+                        this.currentChanceCards.push(new CurrentChanceCard(teleport ? teleport.mean_position : this.currentEvents.getLastPosition(), chanceCard, event.user_id, (_g = event.money) !== null && _g !== void 0 ? _g : event.sum));
                         if (chanceCard.type === 'teleport') {
                             teleport = event;
                         }
@@ -8280,7 +8366,7 @@ let GameState = class GameState extends (external_Vue_default()) {
                     debug('chance', type, packet.msg.id, event.chance_id);
                     switch (type) {
                         case 'cash_in':
-                            pl.income += (_g = (_f = event.money) !== null && _f !== void 0 ? _f : event.sum) !== null && _g !== void 0 ? _g : 0;
+                            pl.income += (_j = (_h = event.money) !== null && _h !== void 0 ? _h : event.sum) !== null && _j !== void 0 ? _j : 0;
                             break;
                         case 'birthday':
                             pl.income += this.getBirthdayMoneyFor(pl, chanceCard.sum);
@@ -8335,7 +8421,8 @@ let GameState = class GameState extends (external_Vue_default()) {
     }
     getCurrentRound(packet, userId) {
         const packetRound = packet.msg.status.round;
-        if (this.players.findIndex(pl => pl.user_id === userId) === this.players.length - 1 && packet.msg.status.action_player !== userId) {
+        const playersLeft = this.storage.status.players.filter(spl => spl.status !== -1);
+        if (playersLeft.findIndex(pl => pl.user_id === userId) === playersLeft.length - 1 && packet.msg.status.action_player !== userId) {
             return packetRound - 1;
         }
         else {
@@ -8348,14 +8435,18 @@ let GameState = class GameState extends (external_Vue_default()) {
         return res;
     }
     isMoveSkipApplied(roll, current) {
+        const diceRollDouble = this.isLastDiceRollDouble(roll);
+        const res = (current || (this.storage.status.round - roll.round) < 1) && (!diceRollDouble || roll.doubleSpent);
+        debug(`isMoveSkipApplied===${res}`, current, this.storage.status.round - roll.round, diceRollDouble, roll);
+        return res;
+    }
+    isLastDiceRollDouble(roll) {
         var _a;
         const dices = (_a = roll.lastDiceEvent) === null || _a === void 0 ? void 0 : _a.dices;
         const diceRollTriple = ((dices === null || dices === void 0 ? void 0 : dices.length) === 3 && dices[0] < 4 && dices[0] === dices[1] && dices[0] === dices[2]);
         const diceRollDouble = ((dices === null || dices === void 0 ? void 0 : dices.length) === 2 && dices[0] === dices[1]) ||
             ((dices === null || dices === void 0 ? void 0 : dices.length) === 3 && dices[0] === dices[1] && !diceRollTriple);
-        const res = (current || (this.storage.status.round - roll.round) < 1) && (!diceRollDouble || roll.doubleSpent);
-        debug(`isMoveSkipApplied===${res}`, current, this.storage.status.round - roll.round, diceRollDouble, diceRollTriple, roll);
-        return res;
+        return diceRollDouble;
     }
     loadDemo(id, tries = 0) {
         return $.get(`https://demos.monopoly-one.com/dl/${this.storage.about.gs_id}/${this.storage.about.gs_game_id}.mid?_=${new Date().getTime()}`)
@@ -9126,7 +9217,30 @@ class PlayerColors {
             jQuery(pl.token)
                 .append('<div class="_skip"/>')
                 .append('<div class="_back" />')
+                .append('<div class="_cntr" />')
                 .children().hide();
+            const idx = this.state.storage.status.players.findIndex(spl => spl.user_id === pl.user_id);
+            this.state.$watch(`storage.status.players.${idx}.doublesRolledAsCombo`, v => {
+                const el = jQuery('div._cntr', pl.token);
+                if (v !== 0) {
+                    el.show().text(v);
+                }
+                else {
+                    el.hide();
+                }
+            });
+            this.state.$watch(() => {
+                const spl = this.state.storage.status.players[idx];
+                return spl.jailed ? spl.unjailAttempts : -1;
+            }, v => {
+                const el = jQuery('div._cntr', pl.token);
+                if (v >= 0 && v < 3) {
+                    el.show().text(3 - v);
+                }
+                else {
+                    el.hide();
+                }
+            });
         });
         debug('players tokens', this.state.players.map(pl => pl.token));
     }
@@ -9798,11 +9912,17 @@ class ShowFieldMove {
                     this.pending = true;
                 }
             });
-            state.$watch('comboJails', v => {
-                this.fjqs.removeClass('_mode_choose_field_available');
-                this.fjqs.parent().removeClass('_mode_choose_field');
-                this.pending = false;
-                this.pendingBus = false;
+            this.state.$watch('currentChooses', (v) => {
+                debug('currentChooses', JSON.parse(JSON.stringify(v)));
+                if (v.length) {
+                    this.fjqs.first().parent().addClass('_mode_choose_field');
+                    if (this.pendingBus) {
+                        this.fjqs.removeClass('_mode_choose_field_available');
+                    }
+                    v.forEach(ev => { var _a; return this.fjqs.eq((_a = ev.field_id) !== null && _a !== void 0 ? _a : ev.mean_position).addClass('_mode_choose_field_available'); });
+                    v.splice(0, v.length);
+                    this.pending = true;
+                }
             });
             state.$watch('wormholeDestinations', (v) => {
                 if (v.length) {
@@ -9831,12 +9951,20 @@ class ShowFieldMove {
     getPositions(v) {
         const reverse = v.move_reverse;
         const dices = v.dices;
+        const singlePos = [v.mean_position];
+        if (this.isComboJail()) {
+            return [];
+        }
+        const spl = this.state.storage.status.players.find(pl => pl.user_id === v.user_id);
+        if (spl.jailed && spl.unjailAttempts !== 2 && !this.state.currentEvents.events.find(e => e.type === 'rollDicesForUnjailSuccess')) {
+            return [];
+        }
         if (dices.length == 2) {
-            return [v.mean_position];
+            return singlePos;
         }
         else if (dices.length > 2 && !this.isTrippleDiceRoll(dices)) {
             const last = dices[2];
-            const currPos = this.state.storage.status.players.find(pl => pl.user_id === v.user_id).position;
+            const currPos = spl.position;
             if (last === 4 || last === 6) {
                 return this.getBusPositions(currPos, dices, reverse, v.user_id);
             }
@@ -9844,7 +9972,7 @@ class ShowFieldMove {
                 return this.getM1Positions(currPos, v.mean_position, reverse, v.user_id);
             }
             else {
-                return [v.mean_position];
+                return singlePos;
             }
         }
         return [];
@@ -9855,14 +9983,15 @@ class ShowFieldMove {
         const fields = this.getDirectionFields(startSearchPos, reverse);
         const vacantFields = fields.filter(f => !f.owner_true);
         const firstVacant = vacantFields.length > 0 && vacantFields[0];
+        const singlePos = [meanPos];
         debug('pos', currPos);
         debug('fields', fields);
         debug('vacant', firstVacant === null || firstVacant === void 0 ? void 0 : firstVacant.field_id);
-        if (meanPos === 30) {
-            return [meanPos];
+        if (this.isPosJail(meanPos)) {
+            return singlePos;
         }
         if (vacantFields.length === 1 && vacantFields[0].field_id === meanPos) {
-            return [meanPos];
+            return singlePos;
         }
         if (firstVacant) {
             return [meanPos, firstVacant.field_id];
@@ -9870,6 +9999,13 @@ class ShowFieldMove {
         else {
             return [meanPos, fields.find(f => f.owner_true !== user && f.mortgaged !== true).field_id];
         }
+    }
+    isComboJail() {
+        return !!this.state.currentEvents.events.find(e => e.type === 'goToJailByCombo');
+    }
+    isPosJail(meanPos) {
+        const byChance = !!this.state.currentEvents.events.find(e => e.type === 'chance' && this.state.storage.config.chance_cards[e.chance_id].type === 'jail');
+        return meanPos === 30 || byChance;
     }
     getDirectionFields(fromPos, reverse) {
         let fields = [...this.state.storage.vms.fields.fields_with_equipment.values()];
@@ -10051,6 +10187,54 @@ class LockableFields {
     }
 }
 
+;// CONCATENATED MODULE: ./src/util/mutator.ts
+class Mutator {
+    mutate(node, cb) {
+        return this.mutateOpt(node, { childList: true }, cb);
+    }
+    mutateAdded(node, cb) {
+        return this.mutate(node, mr => mr.addedNodes.forEach(el => cb(jQuery(el))));
+    }
+    mutateDeep(node, cb) {
+        return this.mutateOpt(node, { childList: true, subtree: true }, cb);
+    }
+    mutateDeepAdded(node, cb) {
+        return this.mutateDeep(node, mr => mr.addedNodes.forEach(el => cb(jQuery(el))));
+    }
+    mutateOpt(node, opts, cb) {
+        const obs = new MutationObserver(list => list.forEach(cb));
+        node.each((i, el) => obs.observe(el, opts));
+        return obs;
+    }
+}
+const mutator = new Mutator();
+/* harmony default export */ var util_mutator = (mutator);
+
+;// CONCATENATED MODULE: ./src/hooks/game/table-chat.ts
+
+class TableChat {
+    constructor(state) {
+        this.state = state;
+        this.kRegExp = new RegExp(/(\d)k/);
+        const chat = jQuery('div.table-body-board-chat div.scr-content');
+        util_mutator.mutateAdded(chat, jq => {
+            const id = jq.find('span[mnpl-userid]:first').mnpl('userid');
+            if (id === '2750164' || id === '2621672') {
+                jq.get(0).childNodes.forEach(node => {
+                    if (node.nodeType === Node.TEXT_NODE && node.nodeValue.indexOf('занимает второе место') !== -1) {
+                        node.nodeValue = node.nodeValue.replace(/второе место/, "❤️первое❤️ место");
+                    }
+                });
+            }
+            jq.get(0).childNodes.forEach(node => {
+                if (node.nodeType === Node.TEXT_NODE && this.kRegExp.test(node.nodeValue)) {
+                    node.nodeValue = node.nodeValue.replace(this.kRegExp, '$1');
+                }
+            });
+        });
+    }
+}
+
 ;// CONCATENATED MODULE: ./src/util/vue-hooker.ts
 
 
@@ -10110,7 +10294,28 @@ const vooker = new VueHookerPlugin();
 ;// CONCATENATED MODULE: ./src/hooks/experimental/expgame.ts
 const expgame =  true ? (state) => { } : 0;
 
+;// CONCATENATED MODULE: ./src/starter/analytics.js
+function initAnalytics() {
+  var ga = document.createElement('script');
+  ga.type = 'text/javascript';
+  ga.async = true;
+  ga.src = 'https://www.googletagmanager.com/gtag/js?id=G-RTVTXF347C';
+  var s = document.getElementsByTagName('script')[0];
+  s.parentNode.insertBefore(ga, s);
+  "mainWaterfall" in window && window.mainWaterfall.then(function () {
+    window.dataLayer = window.dataLayer || [];
+
+    function gtag() {
+      window.dataLayer.push(arguments);
+    }
+
+    gtag('js', new Date());
+    gtag('config', 'G-RTVTXF347C');
+  });
+}
+;
 ;// CONCATENATED MODULE: ./src/starter/game.ts
+
 
 
 
@@ -10141,6 +10346,10 @@ const gameStarter = () => {
         new ShowFieldMove(v, state);
         new ShowChanceCard(v, state);
         new LockableFields(state);
+        new TableChat(state);
+        window.onReadyToUse(() => {
+            initAnalytics();
+        });
     });
     expgame(state);
     debug('M1Pro game boot done');
@@ -10251,18 +10460,88 @@ const opts = {
         <dialog-close></dialog-close>
         <div class="Info-wrap">
             <div class="Info-pages">
-                <div class="Info-btn-main selected"></div>
-                <div class="Info-btn-pro"><div class="badge">1</div></div>
+                <div class="Info-btn-main" :class='{selected: !showPro}'></div>
+                <div class="Info-btn-pro" :class='{selected: showPro}'><div class="badge">1</div></div>
             </div>
             <div class="Info-content">
-                <div class="Info-main selected"></div>
-                <div class="Info-pro">
-                    <div class="Info-pro-head">Текущая версия: ${"1.0.0"}</div>
+                <div class="Info-main" :class='{selected: !showPro}'></div>
+                <div class="Info-pro" :class='{selected: showPro}'>
+                    <div class="Info-pro-head">Текущая версия: ${"1.0.1"}</div>
+                    <div class="Info-pro-general">
+                            <div class="_community">
+                                Сообщество для обсуждения: 
+                                <a href="https://discord.gg/YFzfEBcCKA" rel="nofollow" class="btn">
+                                    <img src="https://camo.githubusercontent.com/f57032cdfa9884f57d69ede973b7c876a17afe1519b0aa271e06299651afbf81/68747470733a2f2f696d672e736869656c64732e696f2f62616467652f446973636f72642d3732383944413f7374796c653d666c6174266c6f676f3d646973636f7264266c6f676f436f6c6f723d7768697465" alt="Discord" data-canonical-src="https://img.shields.io/badge/Discord-7289DA?style=flat&amp;logo=discord&amp;logoColor=white" style="max-width: 100%;">
+                                </a>
+                                <a target="_blank" rel="noopener noreferrer" class="btn" href="https://camo.githubusercontent.com/3f29b62bfbf1a9947a11107ca4aa6296fb2b35acde2a1896019f60194a1292d4/68747470733a2f2f696d672e736869656c64732e696f2f646973636f72642f393637343131323132333639343136313932">
+                                    <img src="https://camo.githubusercontent.com/3f29b62bfbf1a9947a11107ca4aa6296fb2b35acde2a1896019f60194a1292d4/68747470733a2f2f696d672e736869656c64732e696f2f646973636f72642f393637343131323132333639343136313932" alt="Online" data-canonical-src="https://img.shields.io/discord/967411212369416192" style="max-width: 100%;">
+                                </a>
+                            </div>
+                            <div>Заполните <a href="https://forms.gle/NpdZwJaUK4fjPJGa9">форму обратной связи</a> чтобы внести свой вклад в развитие проекта</div>
+                    </div>
+                    <div class="Info-pro-donations">
+                        <h2>Пожертвования</h2>
+                        <div>
+                            <div class="form form-horizontal form-small">
+                                <div class="title title-5">Paypal</div>
+                                <div>
+                                    <form action="https://www.paypal.com/donate" method="post" target="_blank">
+                                        <input type="hidden" name="hosted_button_id" value="DQBQJ5UQEHD3W" />
+                                        <input type="image" src="https://www.paypalobjects.com/en_US/i/btn/btn_donateCC_LG.gif" border="0" name="submit" title="PayPal - The safer, easier way to pay online!" alt="Donate with PayPal button" />
+                                        <img alt="" border="0" src="https://www.paypal.com/en_US/i/scr/pixel.gif" width="1" height="1" />
+                                    </form>
+                                </div>
+                            </div>
+                            <div class="form form-horizontal form-small">
+                                <div class="title title-5">YooMoney</div>
+                                <form method="POST" action="https://yoomoney.ru/quickpay/confirm.xml" target="_blank">
+                                    <input type="hidden" name="receiver" value="410015004852328">
+                                    <input type="hidden" name="quickpay-form" value="donate">
+                                    <input type="hidden" name="targets" value="m1pro">
+                                    <div class="form2-row yoo-controls">
+                                        <input type="text" name="formcomment" placeholder="Комментарий">
+                                        <input type="number" name="sum" value="500" data-type="number" max="15000">
+                                        <label>
+                                            <button type="button" class="button button-small" v-on:click='paymentType = "PC"' :class='{ _selected: paymentType === "PC" }'>
+                                                <span class="yoo-icon yoo-icon-purse"></span>
+                                            </button>
+                                            <input type="radio" name="paymentType" value="PC" :checked='paymentType === "PC"'>
+                                        </label>
+                                        <label>
+                                            <button type="button" class="button button-small" v-on:click='paymentType = "AC"' :class='{ _selected: paymentType === "AC" }'>
+                                                <span class="yoo-icon yoo-icon-card"></span>
+                                            </button>
+                                            <input type="radio" name="paymentType" value="AC" :checked='paymentType === "AC"'>
+                                        </label>
+                                    </div>
+                                    <div class="form2-row buttons">
+                                        <input type="submit" class="button button-small" value="Donate">
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
                     <div class="Info-pro-history">${CHANGELOG}</div>
                 </div>
             </div>
         </div>
     </div>`,
+    data: function () {
+        return {
+            paymentType: 'PC'
+        };
+    },
+    // computed: {
+    //     paymentType: function () {
+    //         debug('paymentType', jQuery('div.yoo-controls input[name="paymentType"]:checked').val())
+    //         return jQuery('div.yoo-controls input[name="paymentType"]:checked').val() ?? "PC";
+    //     }
+    // },
+    methods: {
+        setPT: function (val) {
+            $(`input[name=paymentType][value="${val}"]`).prop('checked', true);
+        }
+    },
     mounted() {
         const jq = jQuery(this.$el);
         const main = jq.find('div.Info-main');
@@ -10282,7 +10561,7 @@ const opts = {
         this.state.$watch('lastSeen', () => {
             jq.find('div.badge').hide();
         });
-        if (this.state.isUnseen("1.0.0")) {
+        if (this.state.isUnseen("1.0.1")) {
             jq.find('div.badge').show();
             jq.find('div.Info-pro-history h3 > strong').each((i, el) => {
                 const jel = jQuery(el);
@@ -10300,11 +10579,12 @@ const opts = {
         });
     }
 };
-/* harmony default export */ var components_info = ((state) => {
+/* harmony default export */ var components_info = ((state, showPro = false) => {
     const info = external_Vue_default().component('info', merge_default()(opts, {
         mixins: [{
                 created() {
                     this.state = state;
+                    this.showPro = showPro;
                 }
             }]
     }));
@@ -10388,7 +10668,7 @@ class HeaderMenu {
         return jQuery(`.header-menu a[href="/${link}"] span`).clone();
     }
     checkVersion() {
-        this.state.isUnseen("1.0.0") ? this.verBadge.show() : this.verBadge.hide();
+        this.state.isUnseen("1.0.1") ? this.verBadge.show() : this.verBadge.hide();
     }
 }
 
@@ -10412,29 +10692,6 @@ class Friends {
         return this.state.getFriends(new FriendsGetReq(Presence.Yes));
     }
 }
-
-;// CONCATENATED MODULE: ./src/util/mutator.ts
-class Mutator {
-    mutate(node, cb) {
-        return this.mutateOpt(node, { childList: true }, cb);
-    }
-    mutateAdded(node, cb) {
-        return this.mutate(node, mr => mr.addedNodes.forEach(el => cb(jQuery(el))));
-    }
-    mutateDeep(node, cb) {
-        return this.mutateOpt(node, { childList: true, subtree: true }, cb);
-    }
-    mutateDeepAdded(node, cb) {
-        return this.mutateDeep(node, mr => mr.addedNodes.forEach(el => cb(jQuery(el))));
-    }
-    mutateOpt(node, opts, cb) {
-        const obs = new MutationObserver(list => list.forEach(cb));
-        node.each((i, el) => obs.observe(el, opts));
-        return obs;
-    }
-}
-const mutator = new Mutator();
-/* harmony default export */ var util_mutator = (mutator);
 
 ;// CONCATENATED MODULE: ./src/hooks/main/chat.ts
 
@@ -11111,7 +11368,7 @@ let MainState = class MainState extends (external_Vue_default()) {
         this.itemPrices = new Map();
         this.lastSeen = localStorage.getItem('last_pro_version_seen') || '0';
         this.gamesNewSettings = null;
-        this.ver = "1.0.0";
+        this.ver = "1.0.1";
         this.listeners = new Map();
     }
     created() {
@@ -11374,7 +11631,55 @@ GamesFilter = games_filter_decorate([
 ;// CONCATENATED MODULE: ./src/hooks/experimental/expmain.ts
 const expmain =  true ? (state) => { } : 0;
 
+;// CONCATENATED MODULE: ./src/pages/banner.ts
+
+class Banner {
+    constructor(state) {
+        this.state = state;
+        if (localStorage.getItem('m1pro_banner_hidden') !== '1') {
+            window.onReadyToUse(() => {
+                this.init();
+            });
+        }
+    }
+    init() {
+        __webpack_require__("./src/style/main/banner.less");
+        const banner = jQuery('<div>').addClass('games-market-list-one _horizontal _m1pro').prependTo('div.games-market-list');
+        banner.css('background-image', 'linear-gradient(162deg, rgb(0, 0, 0) 28%, rgb(220, 20, 60) 130%');
+        const ctr = jQuery('<div>').addClass('_container').appendTo(banner);
+        ctr.append(`
+            <div class="games-market-list-one-text">
+                <div class="games-market-list-one-text-title">Помощь M1Pro</div>
+                <div class="games-market-list-one-text-text">
+                    <div>Оставьте отзыв и оценку на странице расширения, вступите в сообщество для обсуждения, заполните форму обратной связи или пожертвуйте на развитие проекта!</div>
+                </div>
+            </div>
+        `).append(`
+            <div class="games-market-list-one-more">
+                <div class="games-market-list-one-more-image"/>
+                <div class="games-market-list-one-more-button-custom">
+                    <button class="btn btn-white _show">Показать как</button>
+                    <button class="btn btn-white _hide" style="display: none;">Убрать банер</button>
+                </div>
+            </div>
+        `);
+        const dot = jQuery('<div class="_m1pro"></div>').appendTo(".games-market-dots");
+        const hideBtn = ctr.find('button._hide').on('click', () => {
+            localStorage.setItem('m1pro_banner_hidden', '1');
+            dot.remove();
+            banner.remove();
+            jQuery(".games-market-arrow").trigger("click");
+        });
+        ctr.find('button._show').on('click', () => {
+            window.require("/js/dialog.js").showComponent(components_info(this.state, true));
+            hideBtn.show();
+        });
+    }
+}
+
 ;// CONCATENATED MODULE: ./src/starter/main.ts
+
+
 
 
 
@@ -11393,7 +11698,10 @@ const mainStarter = () => {
     page_hooker.add(page => page.pathname.startsWith('/market'), () => __webpack_require__("./src/style/main/market.less"));
     page_hooker.add(page => page.pathname.startsWith('/m1tv'), () => __webpack_require__("./src/style/main/m1tv.less"));
     page_hooker.add(page => page.pathname.startsWith('/trades'), () => __webpack_require__("./src/style/main/trades.css"));
-    page_hooker.add(page => page.pathname.startsWith('/games'), () => new Adaptive());
+    page_hooker.add(page => page.pathname.startsWith('/games'), () => {
+        new Adaptive();
+        new Banner(state);
+    });
     const cb = new CollapseBlock();
     vue_hooker.ifMount(jq => jq.is('div.VueGamesSeasonpass, div.GamesMissions, div.VueGamesTopweek, div.VueGamesFriends, div.Gchat'), v => (cb.add(v)));
     vue_hooker.ifMount(jq => jq.is('div.HeaderUser'), v => new HeaderMenu(v, state));
@@ -11412,6 +11720,7 @@ const mainStarter = () => {
             const $el = jQuery('<div class="header-right"/>').appendTo('body > .header > .widther').get(0);
             new HeaderMenu({ $el }, state);
         }
+        initAnalytics();
     });
     debug('M1Pro main boot done');
 };

@@ -6,7 +6,7 @@
               // ==UserScript==
 // @name        m1pro
 // @namespace   https://alexdymov.github.io/m1pro
-// @version     1.0.1
+// @version     1.0.2
 // @author      Smoke <alex.dymov@gmail.com>
 // @source      https://github.com/alexdymov/m1pro
 // @match       https://monopoly-one.com/*
@@ -9220,15 +9220,6 @@ class PlayerColors {
                 .append('<div class="_cntr" />')
                 .children().hide();
             const idx = this.state.storage.status.players.findIndex(spl => spl.user_id === pl.user_id);
-            this.state.$watch(`storage.status.players.${idx}.doublesRolledAsCombo`, v => {
-                const el = jQuery('div._cntr', pl.token);
-                if (v !== 0) {
-                    el.show().text(v);
-                }
-                else {
-                    el.hide();
-                }
-            });
             this.state.$watch(() => {
                 const spl = this.state.storage.status.players[idx];
                 return spl.jailed ? spl.unjailAttempts : -1;
@@ -10466,7 +10457,7 @@ const opts = {
             <div class="Info-content">
                 <div class="Info-main" :class='{selected: !showPro}'></div>
                 <div class="Info-pro" :class='{selected: showPro}'>
-                    <div class="Info-pro-head">Текущая версия: ${"1.0.1"}</div>
+                    <div class="Info-pro-head">Текущая версия: ${"1.0.2"}</div>
                     <div class="Info-pro-general">
                             <div class="_community">
                                 Сообщество для обсуждения: 
@@ -10561,7 +10552,7 @@ const opts = {
         this.state.$watch('lastSeen', () => {
             jq.find('div.badge').hide();
         });
-        if (this.state.isUnseen("1.0.1")) {
+        if (this.state.isUnseen("1.0.2")) {
             jq.find('div.badge').show();
             jq.find('div.Info-pro-history h3 > strong').each((i, el) => {
                 const jel = jQuery(el);
@@ -10668,7 +10659,7 @@ class HeaderMenu {
         return jQuery(`.header-menu a[href="/${link}"] span`).clone();
     }
     checkVersion() {
-        this.state.isUnseen("1.0.1") ? this.verBadge.show() : this.verBadge.hide();
+        this.state.isUnseen("1.0.2") ? this.verBadge.show() : this.verBadge.hide();
     }
 }
 
@@ -11368,7 +11359,7 @@ let MainState = class MainState extends (external_Vue_default()) {
         this.itemPrices = new Map();
         this.lastSeen = localStorage.getItem('last_pro_version_seen') || '0';
         this.gamesNewSettings = null;
-        this.ver = "1.0.1";
+        this.ver = "1.0.2";
         this.listeners = new Map();
     }
     created() {

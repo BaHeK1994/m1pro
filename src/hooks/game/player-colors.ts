@@ -32,14 +32,6 @@ export class PlayerColors {
                 .append('<div class="_cntr" />')
                 .children().hide();
             const idx = this.state.storage.status.players.findIndex(spl => spl.user_id === pl.user_id);
-            this.state.$watch(`storage.status.players.${idx}.doublesRolledAsCombo`, v => {
-                const el = jQuery('div._cntr', pl.token);
-                if (v !== 0) {
-                    el.show().text(v);
-                } else {
-                    el.hide();
-                }
-            });
             this.state.$watch(() => {
                 const spl = this.state.storage.status.players[idx];
                 return spl.jailed ? spl.unjailAttempts : -1;

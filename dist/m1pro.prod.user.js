@@ -6,7 +6,7 @@
               // ==UserScript==
 // @name        m1pro
 // @namespace   https://alexdymov.github.io/m1pro
-// @version     1.0.1a
+// @version     1.0.0
 // @author      Smoke <alex.dymov@gmail.com>
 // @source      https://github.com/alexdymov/m1pro
 // @match       https://monopoly-one.com/*
@@ -8108,6 +8108,7 @@ let GameState = class GameState extends (external_Vue_default()) {
         this.$watch('settings', (v) => {
             localStorage.setItem('game_settings', JSON.stringify(this.settings));
         }, { deep: true });
+        debug(this);
         this.$watch('users', v => {
             this.players.forEach(pl => {
                 const user = this.users[pl.user_id];
@@ -10338,7 +10339,26 @@ function initAnalytics() {
   });
 }
 ;
+;// CONCATENATED MODULE: ./src/hooks/game/table-generator-dices.ts
+class TableGeneratorDices {
+    init(base, state) {
+        console.log('table-generator-dices');
+        const oldPrepareDices = base.$options.methods.prepareDices;
+        base.$options.methods.prepareDices = function (e) {
+            console.log('prepareDices', e);
+            const generator = window._replacements.generators.get(window.API.user.user_id);
+            generator.generator_id = 49;
+            generator.type = 'spinner';
+            if (state.storage.status.action_player === window.API.user.user_id) {
+                e.item_proto_id = 49;
+            }
+            oldPrepareDices.apply(base, [e]);
+        };
+    }
+}
+
 ;// CONCATENATED MODULE: ./src/starter/game.ts
+
 
 
 
@@ -10349,14 +10369,16 @@ function initAnalytics() {
 const gameStarter = () => {
     debug('M1Pro game boot');
     external_Vue_default().use(vue_hooker);
-    // vooker.debug = true;
+    vue_hooker.debug = true;
     const state = new game_state();
     __webpack_require__("./src/style/game.less");
     __webpack_require__("./src/style/game/tips.css");
     __webpack_require__("./src/style/game/remove-k.css");
     const contract = new TableContract(state);
+    const generatorDices = new TableGeneratorDices();
     vue_hooker.ifBeforeCreate(v => v.$options.name === 'storage', v => state.init(v));
     vue_hooker.ifBeforeCreate(v => v.$options.name === 'table-contract', v => contract.init(v));
+    vue_hooker.ifBeforeCreate(v => v.$options.name === 'table-generator-dices', v => generatorDices.init(v, state));
     vue_hooker.ifMount(jq => jq.is('div.TableContract'), v => contract.mount());
     vue_hooker.ifMount(jq => jq.is('div.TableAction'), v => new TableAction(v, state));
     vue_hooker.ifBeforeCreate(v => v.$options.name === 'table-helper', v => GameStats.fixTicker(v));
@@ -10490,7 +10512,7 @@ const opts = {
             <div class="Info-content">
                 <div class="Info-main" :class='{selected: !showPro}'></div>
                 <div class="Info-pro" :class='{selected: showPro}'>
-                    <div class="Info-pro-head">Текущая версия: ${"1.0.1a"}</div>
+                    <div class="Info-pro-head">Текущая версия: ${"1.0.0"}</div>
                     <div class="Info-pro-general">
                             <div class="_community">
                                 Сообщество для обсуждения: 
@@ -10585,7 +10607,7 @@ const opts = {
         this.state.$watch('lastSeen', () => {
             jq.find('div.badge').hide();
         });
-        if (this.state.isUnseen("1.0.1a")) {
+        if (this.state.isUnseen("1.0.0")) {
             jq.find('div.badge').show();
             jq.find('div.Info-pro-history h3 > strong').each((i, el) => {
                 const jel = jQuery(el);
@@ -10692,7 +10714,7 @@ class HeaderMenu {
         return jQuery(`.header-menu a[href="/${link}"] span`).clone();
     }
     checkVersion() {
-        this.state.isUnseen("1.0.1a") ? this.verBadge.show() : this.verBadge.hide();
+        this.state.isUnseen("1.0.0") ? this.verBadge.show() : this.verBadge.hide();
     }
 }
 
@@ -11392,7 +11414,7 @@ let MainState = class MainState extends (external_Vue_default()) {
         this.itemPrices = new Map();
         this.lastSeen = localStorage.getItem('last_pro_version_seen') || '0';
         this.gamesNewSettings = null;
-        this.ver = "1.0.1a";
+        this.ver = "1.0.0";
         this.listeners = new Map();
     }
     created() {

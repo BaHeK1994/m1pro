@@ -171,6 +171,8 @@ export default class GameState extends Vue {
             localStorage.setItem('game_settings', JSON.stringify(this.settings));
         }, { deep: true });
 
+        debug(this);
+
         this.$watch('users', v => {
             this.players.forEach(pl => {
                 const user = this.users[pl.user_id];

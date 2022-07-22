@@ -2,6 +2,7 @@ import { MarketLotThing, UserInfoLong, UserData, SocketData, SocketEvent, BanInf
 
 declare global {
     interface Window {
+        _replacements: any
         onReadyToUse: (fn: any) => void
         tableResize: (v: boolean) => void
         require: {

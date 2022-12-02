@@ -1,14 +1,14 @@
-import { debug } from '../util/debug';
 import Vue from 'vue';
-import vooker from '../util/vue-hooker';
-import pooker from '../util/page-hooker';
-import { Chat, CollapseBlock, Friends, GamesRooms, HeaderMenu, Item, GamesRoomsOne, GamesNewRoom } from '../hooks/main';
-import { Adaptive, Profile } from '../pages';
-import MainState from '../components/main-state';
 import GamesFilter from '../components/games-filter';
+import MainState from '../components/main-state';
 import { expmain } from '../hooks/experimental/expmain';
-import initAnalytics from './analytics';
+import { Chat, CollapseBlock, Friends, GamesNewRoom, GamesRooms, GamesRoomsOne, HeaderMenu, Item } from '../hooks/main';
+import { Adaptive, Profile } from '../pages';
 import Banner from '../pages/banner';
+import { debug } from '../util/debug';
+import pooker from '../util/page-hooker';
+import vooker from '../util/vue-hooker';
+import { initAnalytics } from './analytics';
 
 export const mainStarter = () => {
     debug('M1Pro main boot');
@@ -33,9 +33,13 @@ export const mainStarter = () => {
     vooker.ifMount((jq, v) => v.$options.name === 'inventory2', v => require('../style/main/inventory.less'));
     vooker.ifMount(jq => jq.is('div.Item'), v => new Item(v, state));
 
-    const filter = new GamesFilter();
-    vooker.ifMount(jq => jq.is('div.VueGamesRooms'), v => new GamesRooms(v, filter));
-    vooker.ifMount(jq => jq.is('div.VueGamesRoomsOne'), v => new GamesRoomsOne(v, filter, state));
+    let filter: GamesFilter = null;
+    const getFilter = () => {
+        !filter && (filter = new GamesFilter());
+        return filter;
+    }
+    vooker.ifMount(jq => jq.is('div.VueGamesRooms'), v => new GamesRooms(v, getFilter()));
+    vooker.ifMount(jq => jq.is('div.VueGamesRoomsOne'), v => new GamesRoomsOne(v, getFilter(), state));
     vooker.ifMount(jq => jq.is('div.GamesNewroom'), v => new GamesNewRoom(v, state));
     expmain(state);
     pooker.run();

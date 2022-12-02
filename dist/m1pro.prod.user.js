@@ -1,12 +1,11 @@
 
-        Object.defineProperty(window, "Vue", {
-          configurable: true,
-            set(v) {
-              Object.defineProperty(window, "Vue", { configurable: true, enumerable: true, writable: true, value: v });
+        function bootm1pro() {
+          require.async("//cdn.jsdelivr.net/npm/vue@2.6.10/dist/vue.min.js").then(vv => {
+            window.Vue = vv;
               // ==UserScript==
 // @name        m1pro
 // @namespace   https://alexdymov.github.io/m1pro
-// @version     1.0.1a
+// @version     1.0.2a
 // @author      Smoke <alex.dymov@gmail.com>
 // @source      https://github.com/alexdymov/m1pro
 // @match       https://monopoly-one.com/*
@@ -7245,310 +7244,6 @@ var dev_update = injectStylesIntoStyleTag_default()(dev/* default */.Z, dev_opti
 
        /* harmony default export */ var style_dev = (dev/* default */.Z && dev/* default.locals */.Z.locals ? dev/* default.locals */.Z.locals : undefined);
 
-;// CONCATENATED MODULE: ./src/util/debug.ts
-const enabled = localStorage.getItem('smart_cache_debug') === '1';
-const debug = enabled
-    ? console.log.bind(window.console, '%c[M1PRO] %c', 'color: red', 'color: unset')
-    : function () { };
-
-// EXTERNAL MODULE: ./node_modules/lodash/merge.js
-var merge = __webpack_require__("./node_modules/lodash/merge.js");
-var merge_default = /*#__PURE__*/__webpack_require__.n(merge);
-;// CONCATENATED MODULE: ./src/hooks/game/table-contract.ts
-
-
-class TableContract {
-    constructor(state) {
-        this.state = state;
-    }
-    init(base) {
-        this.base = base;
-        const ref = this;
-        merge_default()(base.$options, {
-            computed: {
-                vm_fields: function () {
-                    var _a;
-                    const status = (_a = ref.state.ongoingContract) === null || _a === void 0 ? void 0 : _a.status;
-                    if (status) {
-                        return ref.getFieldsMock(status);
-                    }
-                    else {
-                        return ref.state.vmfields;
-                    }
-                }
-            }
-        });
-    }
-    mount() {
-        this.user = window.API.user.user_id;
-        this.jq = jQuery(this.base.$el);
-        __webpack_require__("./src/style/game/table-contract.less");
-        this.btnCtr = jQuery('<div class="TableContract-content-buttons"/>').appendTo(this.jq.get(0));
-        this.initEqBtn();
-        this.initX2Btn();
-        this.initPaymentHelper();
-        this.base.$watch('contract_ui', v => {
-            if (!v || this.state.ongoingContract || !this.state.mePlaying)
-                return;
-            this.checkEq();
-            this.checkX2();
-        }, { deep: true });
-        this.state.$watch('ongoingContract', (ci) => {
-            debug('show ongoing contract', JSON.parse(JSON.stringify(ci)));
-            if (ci) {
-                this.base.contract = {
-                    user_id_from: ci.from,
-                    field_ids_from: [...ci.out_fields],
-                    money_from: ci.out_money,
-                    user_id_to: ci.to,
-                    field_ids_to: [...ci.in_fields],
-                    money_to: ci.in_money,
-                };
-                this.base.mode = 2;
-                this.btnCtr.hide();
-                this.jq.find('div.TableContract-actions').hide();
-                this.diffhelp.hide();
-            }
-            else {
-                this.base.contract = {
-                    user_id_from: 0,
-                    field_ids_from: [],
-                    money_from: 0,
-                    user_id_to: 0,
-                    field_ids_to: [],
-                    money_to: 0,
-                };
-                this.base.mode = 0;
-                this.btnCtr.show();
-                this.diffhelp.show();
-                this.jq.find('div.TableContract-actions').show();
-            }
-        });
-        this.base.$watch('mode', v => {
-            v === 0 && (this.state.ongoingContract = null);
-        });
-    }
-    getFieldsMock(status) {
-        const fields_with_equipment = new Map();
-        const config = this.state.storage.config;
-        if (null !== status) {
-            config.fields.forEach((field, id) => {
-                if ("field" !== field.type)
-                    return;
-                const statusField = status.fields[id];
-                const fieldGroup = config.groups[field.group];
-                const fe = {
-                    field_id: id,
-                    title: field.title,
-                    image: field.image,
-                    group: field.group,
-                    coeff_rent: 1,
-                };
-                if (config.version < 5) {
-                    fe.buy = fieldGroup.buy;
-                    fe.levels = fieldGroup.levels;
-                }
-                else {
-                    if (1 === field.is_last) {
-                        fe.buy = fieldGroup.buy_last;
-                        fe.levels = fieldGroup.levels_last;
-                    }
-                    else {
-                        fe.buy = fieldGroup.buy;
-                        fe.levels = fieldGroup.levels;
-                    }
-                }
-                // undefined !== fieldGroup.coeffs && (fe.coeffs = window._libs.fns.cloneJSON(fieldGroup.coeffs));
-                // undefined !== fieldGroup.coeffs_rentmirror && (fe.coeffs_rentmirror = window._libs.fns.cloneJSON(fieldGroup.coeffs_rentmirror));
-                fe.levelUpCost = fieldGroup.levelUpCost;
-                if (undefined !== statusField) {
-                    fe.owner_true = statusField.owner;
-                    fe.level = statusField.level;
-                    fe.mortgaged = statusField.mortgaged;
-                    undefined !== statusField.mortgage_lose_round &&
-                        (fe.mortgage_lose_round = statusField.mortgage_lose_round);
-                }
-                fields_with_equipment.set(id, fe);
-            });
-        }
-        debug('pre got field mocks', fields_with_equipment);
-        return { fields_with_equipment };
-    }
-    initPaymentHelper() {
-        this.payhelp = jQuery('<div class="TableContract-actions-payment"><span>К оплате: <span class="paysum"/></span></div>').prependTo(this.jq.find('div.TableContract-actions'));
-        this.diffhelp = jQuery('<div class="TableContract-content-payment"><span class="paydifftext"/>: <span class="paydiff"/><span class="paydiff_withmort"> (с закладом текущих полей <span class="paydifftext_mort"/>: <span class="paydiff_mort"/>)</span></div>').appendTo(this.jq.find('div.TableContract-content'));
-        ;
-        this.base.$watch('contract_ui', v => {
-            var _a, _b;
-            if (!v || this.state.ongoingContract)
-                return;
-            const user = this.base.contract.user_id_from;
-            const spl = this.state.storage.status.players.find(spl => spl.user_id === user);
-            const field = this.state.storage.vms.fields.fields_with_equipment.get(spl.position);
-            const money = ((_a = this.state.storage.current_move) === null || _a === void 0 ? void 0 : _a.moneyToPay) || ((_b = this.state.storage.current_move) === null || _b === void 0 ? void 0 : _b.pay) || (field && field.owner_true === undefined ? field.buy : 0);
-            const plMoney = spl.money;
-            if (money && money > 0) {
-                this.payhelp.show().find('span.paysum').text(this.state.formatMoney(money)).end();
-                const fieldsWorth = this.base.contract.field_ids_to
-                    .map(id => this.state.storage.vms.fields.fields_with_equipment.get(id))
-                    .map(field => this.state.getFieldMortgageWorth(field)).reduce((a, b) => a + b, 0);
-                let diff = plMoney - money + (this.base.contract.money_to || 0) + fieldsWorth;
-                this.diffhelp.show().find('span.paydifftext').text(diff >= 0 ? 'Остаток' : 'Нехватка');
-                this.showDiff('paydiff', diff);
-                if (diff < 0) {
-                    this.diffhelp.find('span.paydiff_withmort').show();
-                    diff += this.state.getPlayerFieldsWorth(user);
-                    this.diffhelp.find('span.paydifftext_mort').text(diff >= 0 ? 'остаток' : 'нехватка');
-                    this.showDiff('paydiff_mort', diff);
-                }
-                else {
-                    this.diffhelp.find('span.paydiff_withmort').hide();
-                }
-            }
-            else {
-                this.payhelp.hide();
-                this.diffhelp.hide();
-            }
-        }, { deep: true });
-    }
-    showDiff(cls, diff) {
-        this.diffhelp.find(`span.${cls}`)
-            .text(this.state.formatMoney(Math.abs(diff)))
-            .addClass(diff >= 0 ? 'diff_pos' : 'diff_neg')
-            .removeClass(diff < 0 ? 'diff_pos' : 'diff_neg');
-    }
-    checkEq() {
-        const [left, right] = this.getSums();
-        const outgoing = this.base.contract.user_id_from === this.user;
-        const team = this.state.players.find(pl => pl.user_id === this.user).team;
-        const toTeammate = this.state.party && this.state.players.find(pl => pl.user_id === this.base.contract.user_id_to).team === team;
-        if (!this.base.is_m1tv && left !== right && outgoing && !toTeammate) {
-            this.eqBtn.show();
-        }
-        else {
-            this.eqBtn.hide();
-        }
-    }
-    checkX2() {
-        const [left, right] = this.getSums();
-        const outgoing = this.base.contract.user_id_from === this.user;
-        const team = this.state.players.find(pl => pl.user_id === this.user).team;
-        const toTeammate = this.state.party && this.state.players.find(pl => pl.user_id === this.base.contract.user_id_to).team === team;
-        this.x2BtnFrom.hide();
-        this.x2BtnTo.hide();
-        if (!this.base.is_m1tv && !toTeammate && outgoing) {
-            if ((left * 2) !== right) {
-                this.x2BtnTo.show();
-            }
-            if (left !== (right * 2)) {
-                this.x2BtnFrom.show();
-            }
-        }
-    }
-    initEqBtn() {
-        this.eqBtn = jQuery('<div class="_button">= =</div>').hide().appendTo(this.btnCtr)
-            .on('click', () => {
-            if (this.base.contract.money_from || this.base.contract.money_to) {
-                this.base.contract.money_from = this.base.contract.money_to = 0;
-            }
-            const [left, right] = this.getSums();
-            const diff = left - right;
-            if (diff > 0) {
-                this.base.contract.money_to += diff;
-            }
-            else {
-                this.base.contract.money_from += Math.abs(diff);
-            }
-        });
-    }
-    initX2Btn() {
-        this.x2BtnFrom = jQuery('<div class="_button ion-chevron-left">x2</div>').hide().appendTo(this.btnCtr)
-            .on('click', () => {
-            if (this.base.contract.money_from || this.base.contract.money_to) {
-                this.base.contract.money_from = this.base.contract.money_to = 0;
-            }
-            const [left, right] = this.getSums();
-            const diff = left - right * 2;
-            if (diff > 0) {
-                this.base.contract.money_to += diff;
-            }
-            else {
-                this.base.contract.money_from += Math.abs(diff);
-            }
-        });
-        this.x2BtnTo = jQuery('<div class="_button ion-chevron-right">x2</div>').hide().appendTo(this.btnCtr)
-            .on('click', () => {
-            if (this.base.contract.money_from || this.base.contract.money_to) {
-                this.base.contract.money_from = this.base.contract.money_to = 0;
-            }
-            const [left, right] = this.getSums();
-            const diff = left * 2 - right;
-            if (diff > 0) {
-                this.base.contract.money_to += diff;
-            }
-            else {
-                this.base.contract.money_from += Math.abs(diff);
-            }
-        });
-    }
-    getSums() {
-        return this.base.contract_ui.map(ui => Number(ui.sum.replace(new RegExp(/,/, 'g'), '')));
-    }
-}
-
-;// CONCATENATED MODULE: ./src/hooks/game/table-action.ts
-
-class TableAction {
-    constructor(base, state) {
-        this.base = base;
-        this.state = state;
-        __webpack_require__("./src/style/game/table-action.less");
-        if (!state.storage.about.is_m1tv) {
-            state.$watch('loaded', () => {
-                this.init();
-            });
-        }
-    }
-    init() {
-        this.base.$watch('$parent.action_types', (val) => {
-            debug('action_types', val);
-            if (val.size && this.state.user.user_id === this.state.storage.status.action_player) {
-                if (val.has('toAuction')) {
-                    const move = this.base.player.position;
-                    const locked = this.state.lockedFields.has(move);
-                    debug('actions', val, move, locked);
-                    locked && this.perform('toAuction', val);
-                }
-                if (val.has('auctionDecline')) {
-                    const move = this.state.storage.current_move.field;
-                    const locked = this.state.lockedFields.has(move);
-                    debug('actions', val, move, locked);
-                    locked && this.perform('auctionDecline', val);
-                }
-                if (val.has('noBuy')) {
-                    const move = this.base.player.position;
-                    const locked = this.state.lockedFields.has(move);
-                    debug('actions', val, move, locked);
-                    locked && this.perform('noBuy', val);
-                }
-            }
-        });
-    }
-    perform(act, val) {
-        const event = {
-            isTrusted: true,
-            cancelable: false,
-            x: 0, y: 0,
-            clientX: 0, clientY: 0,
-            offsetX: 0, offsetY: 0,
-            layerX: 0, layerY: 0,
-            screnX: 0, screnY: 0,
-        };
-        this.base.action(event, act, {});
-        this.base.is_hidden = true;
-    }
-}
-
 ;// CONCATENATED MODULE: external "Vue"
 var external_Vue_namespaceObject = Vue;
 var external_Vue_default = /*#__PURE__*/__webpack_require__.n(external_Vue_namespaceObject);
@@ -8003,6 +7698,15 @@ class CurrentChanceCard {
         this.sum = sum;
     }
 }
+
+// EXTERNAL MODULE: ./node_modules/lodash/merge.js
+var merge = __webpack_require__("./node_modules/lodash/merge.js");
+var merge_default = /*#__PURE__*/__webpack_require__.n(merge);
+;// CONCATENATED MODULE: ./src/util/debug.ts
+const enabled = localStorage.getItem('smart_cache_debug') === '1';
+const debug = enabled
+    ? console.log.bind(window.console, '%c[M1PRO] %c', 'color: red', 'color: unset')
+    : function () { };
 
 // EXTERNAL MODULE: ./node_modules/lodash/cloneDeep.js
 var cloneDeep = __webpack_require__("./node_modules/lodash/cloneDeep.js");
@@ -8631,6 +8335,304 @@ GameState = __decorate([
     vue_class_component_esm
 ], GameState);
 /* harmony default export */ var game_state = (GameState);
+
+;// CONCATENATED MODULE: ./src/hooks/experimental/expgame.ts
+const expgame =  true ? (state) => { } : 0;
+
+;// CONCATENATED MODULE: ./src/hooks/game/table-contract.ts
+
+
+class TableContract {
+    constructor(state) {
+        this.state = state;
+    }
+    init(base) {
+        this.base = base;
+        const ref = this;
+        merge_default()(base.$options, {
+            computed: {
+                vm_fields: function () {
+                    var _a;
+                    const status = (_a = ref.state.ongoingContract) === null || _a === void 0 ? void 0 : _a.status;
+                    if (status) {
+                        return ref.getFieldsMock(status);
+                    }
+                    else {
+                        return ref.state.vmfields;
+                    }
+                }
+            }
+        });
+    }
+    mount() {
+        this.user = window.API.user.user_id;
+        this.jq = jQuery(this.base.$el);
+        __webpack_require__("./src/style/game/table-contract.less");
+        this.btnCtr = jQuery('<div class="TableContract-content-buttons"/>').appendTo(this.jq.get(0));
+        this.initEqBtn();
+        this.initX2Btn();
+        this.initPaymentHelper();
+        this.base.$watch('contract_ui', v => {
+            if (!v || this.state.ongoingContract || !this.state.mePlaying)
+                return;
+            this.checkEq();
+            this.checkX2();
+        }, { deep: true });
+        this.state.$watch('ongoingContract', (ci) => {
+            debug('show ongoing contract', JSON.parse(JSON.stringify(ci)));
+            if (ci) {
+                this.base.contract = {
+                    user_id_from: ci.from,
+                    field_ids_from: [...ci.out_fields],
+                    money_from: ci.out_money,
+                    user_id_to: ci.to,
+                    field_ids_to: [...ci.in_fields],
+                    money_to: ci.in_money,
+                };
+                this.base.mode = 2;
+                this.btnCtr.hide();
+                this.jq.find('div.TableContract-actions').hide();
+                this.diffhelp.hide();
+            }
+            else {
+                this.base.contract = {
+                    user_id_from: 0,
+                    field_ids_from: [],
+                    money_from: 0,
+                    user_id_to: 0,
+                    field_ids_to: [],
+                    money_to: 0,
+                };
+                this.base.mode = 0;
+                this.btnCtr.show();
+                this.diffhelp.show();
+                this.jq.find('div.TableContract-actions').show();
+            }
+        });
+        this.base.$watch('mode', v => {
+            v === 0 && (this.state.ongoingContract = null);
+        });
+    }
+    getFieldsMock(status) {
+        const fields_with_equipment = new Map();
+        const config = this.state.storage.config;
+        if (null !== status) {
+            config.fields.forEach((field, id) => {
+                if ("field" !== field.type)
+                    return;
+                const statusField = status.fields[id];
+                const fieldGroup = config.groups[field.group];
+                const fe = {
+                    field_id: id,
+                    title: field.title,
+                    image: field.image,
+                    group: field.group,
+                    coeff_rent: 1,
+                };
+                if (config.version < 5) {
+                    fe.buy = fieldGroup.buy;
+                    fe.levels = fieldGroup.levels;
+                }
+                else {
+                    if (1 === field.is_last) {
+                        fe.buy = fieldGroup.buy_last;
+                        fe.levels = fieldGroup.levels_last;
+                    }
+                    else {
+                        fe.buy = fieldGroup.buy;
+                        fe.levels = fieldGroup.levels;
+                    }
+                }
+                // undefined !== fieldGroup.coeffs && (fe.coeffs = window._libs.fns.cloneJSON(fieldGroup.coeffs));
+                // undefined !== fieldGroup.coeffs_rentmirror && (fe.coeffs_rentmirror = window._libs.fns.cloneJSON(fieldGroup.coeffs_rentmirror));
+                fe.levelUpCost = fieldGroup.levelUpCost;
+                if (undefined !== statusField) {
+                    fe.owner_true = statusField.owner;
+                    fe.level = statusField.level;
+                    fe.mortgaged = statusField.mortgaged;
+                    undefined !== statusField.mortgage_lose_round &&
+                        (fe.mortgage_lose_round = statusField.mortgage_lose_round);
+                }
+                fields_with_equipment.set(id, fe);
+            });
+        }
+        debug('pre got field mocks', fields_with_equipment);
+        return { fields_with_equipment };
+    }
+    initPaymentHelper() {
+        this.payhelp = jQuery('<div class="TableContract-actions-payment"><span>К оплате: <span class="paysum"/></span></div>').prependTo(this.jq.find('div.TableContract-actions'));
+        this.diffhelp = jQuery('<div class="TableContract-content-payment"><span class="paydifftext"/>: <span class="paydiff"/><span class="paydiff_withmort"> (с закладом текущих полей <span class="paydifftext_mort"/>: <span class="paydiff_mort"/>)</span></div>').appendTo(this.jq.find('div.TableContract-content'));
+        ;
+        this.base.$watch('contract_ui', v => {
+            var _a, _b;
+            if (!v || this.state.ongoingContract)
+                return;
+            const user = this.base.contract.user_id_from;
+            const spl = this.state.storage.status.players.find(spl => spl.user_id === user);
+            const field = this.state.storage.vms.fields.fields_with_equipment.get(spl.position);
+            const money = ((_a = this.state.storage.current_move) === null || _a === void 0 ? void 0 : _a.moneyToPay) || ((_b = this.state.storage.current_move) === null || _b === void 0 ? void 0 : _b.pay) || (field && field.owner_true === undefined ? field.buy : 0);
+            const plMoney = spl.money;
+            if (money && money > 0) {
+                this.payhelp.show().find('span.paysum').text(this.state.formatMoney(money)).end();
+                const fieldsWorth = this.base.contract.field_ids_to
+                    .map(id => this.state.storage.vms.fields.fields_with_equipment.get(id))
+                    .map(field => this.state.getFieldMortgageWorth(field)).reduce((a, b) => a + b, 0);
+                let diff = plMoney - money + (this.base.contract.money_to || 0) + fieldsWorth;
+                this.diffhelp.show().find('span.paydifftext').text(diff >= 0 ? 'Остаток' : 'Нехватка');
+                this.showDiff('paydiff', diff);
+                if (diff < 0) {
+                    this.diffhelp.find('span.paydiff_withmort').show();
+                    diff += this.state.getPlayerFieldsWorth(user);
+                    this.diffhelp.find('span.paydifftext_mort').text(diff >= 0 ? 'остаток' : 'нехватка');
+                    this.showDiff('paydiff_mort', diff);
+                }
+                else {
+                    this.diffhelp.find('span.paydiff_withmort').hide();
+                }
+            }
+            else {
+                this.payhelp.hide();
+                this.diffhelp.hide();
+            }
+        }, { deep: true });
+    }
+    showDiff(cls, diff) {
+        this.diffhelp.find(`span.${cls}`)
+            .text(this.state.formatMoney(Math.abs(diff)))
+            .addClass(diff >= 0 ? 'diff_pos' : 'diff_neg')
+            .removeClass(diff < 0 ? 'diff_pos' : 'diff_neg');
+    }
+    checkEq() {
+        const [left, right] = this.getSums();
+        const outgoing = this.base.contract.user_id_from === this.user;
+        const team = this.state.players.find(pl => pl.user_id === this.user).team;
+        const toTeammate = this.state.party && this.state.players.find(pl => pl.user_id === this.base.contract.user_id_to).team === team;
+        if (!this.base.is_m1tv && left !== right && outgoing && !toTeammate) {
+            this.eqBtn.show();
+        }
+        else {
+            this.eqBtn.hide();
+        }
+    }
+    checkX2() {
+        const [left, right] = this.getSums();
+        const outgoing = this.base.contract.user_id_from === this.user;
+        const team = this.state.players.find(pl => pl.user_id === this.user).team;
+        const toTeammate = this.state.party && this.state.players.find(pl => pl.user_id === this.base.contract.user_id_to).team === team;
+        this.x2BtnFrom.hide();
+        this.x2BtnTo.hide();
+        if (!this.base.is_m1tv && !toTeammate && outgoing) {
+            if ((left * 2) !== right) {
+                this.x2BtnTo.show();
+            }
+            if (left !== (right * 2)) {
+                this.x2BtnFrom.show();
+            }
+        }
+    }
+    initEqBtn() {
+        this.eqBtn = jQuery('<div class="_button">= =</div>').hide().appendTo(this.btnCtr)
+            .on('click', () => {
+            if (this.base.contract.money_from || this.base.contract.money_to) {
+                this.base.contract.money_from = this.base.contract.money_to = 0;
+            }
+            const [left, right] = this.getSums();
+            const diff = left - right;
+            if (diff > 0) {
+                this.base.contract.money_to += diff;
+            }
+            else {
+                this.base.contract.money_from += Math.abs(diff);
+            }
+        });
+    }
+    initX2Btn() {
+        this.x2BtnFrom = jQuery('<div class="_button ion-chevron-left">x2</div>').hide().appendTo(this.btnCtr)
+            .on('click', () => {
+            if (this.base.contract.money_from || this.base.contract.money_to) {
+                this.base.contract.money_from = this.base.contract.money_to = 0;
+            }
+            const [left, right] = this.getSums();
+            const diff = left - right * 2;
+            if (diff > 0) {
+                this.base.contract.money_to += diff;
+            }
+            else {
+                this.base.contract.money_from += Math.abs(diff);
+            }
+        });
+        this.x2BtnTo = jQuery('<div class="_button ion-chevron-right">x2</div>').hide().appendTo(this.btnCtr)
+            .on('click', () => {
+            if (this.base.contract.money_from || this.base.contract.money_to) {
+                this.base.contract.money_from = this.base.contract.money_to = 0;
+            }
+            const [left, right] = this.getSums();
+            const diff = left * 2 - right;
+            if (diff > 0) {
+                this.base.contract.money_to += diff;
+            }
+            else {
+                this.base.contract.money_from += Math.abs(diff);
+            }
+        });
+    }
+    getSums() {
+        return this.base.contract_ui.map(ui => Number(ui.sum.replace(new RegExp(/,/, 'g'), '')));
+    }
+}
+
+;// CONCATENATED MODULE: ./src/hooks/game/table-action.ts
+
+class TableAction {
+    constructor(base, state) {
+        this.base = base;
+        this.state = state;
+        __webpack_require__("./src/style/game/table-action.less");
+        if (!state.storage.about.is_m1tv) {
+            state.$watch('loaded', () => {
+                this.init();
+            });
+        }
+    }
+    init() {
+        this.base.$watch('$parent.action_types', (val) => {
+            debug('action_types', val);
+            if (val.size && this.state.user.user_id === this.state.storage.status.action_player) {
+                if (val.has('toAuction')) {
+                    const move = this.base.player.position;
+                    const locked = this.state.lockedFields.has(move);
+                    debug('actions', val, move, locked);
+                    locked && this.perform('toAuction', val);
+                }
+                if (val.has('auctionDecline')) {
+                    const move = this.state.storage.current_move.field;
+                    const locked = this.state.lockedFields.has(move);
+                    debug('actions', val, move, locked);
+                    locked && this.perform('auctionDecline', val);
+                }
+                if (val.has('noBuy')) {
+                    const move = this.base.player.position;
+                    const locked = this.state.lockedFields.has(move);
+                    debug('actions', val, move, locked);
+                    locked && this.perform('noBuy', val);
+                }
+            }
+        });
+    }
+    perform(act, val) {
+        const event = {
+            isTrusted: true,
+            cancelable: false,
+            x: 0, y: 0,
+            clientX: 0, clientY: 0,
+            offsetX: 0, offsetY: 0,
+            layerX: 0, layerY: 0,
+            screnX: 0, screnY: 0,
+        };
+        this.base.action(event, act, {});
+        this.base.is_hidden = true;
+    }
+}
 
 ;// CONCATENATED MODULE: ./src/components/chance-items.ts
 var chance_items_decorate = (undefined && undefined.__decorate) || function (decorators, target, key, desc) {
@@ -10315,11 +10317,8 @@ class VueHookerPlugin {
 const vooker = new VueHookerPlugin();
 /* harmony default export */ var vue_hooker = (vooker);
 
-;// CONCATENATED MODULE: ./src/hooks/experimental/expgame.ts
-const expgame =  true ? (state) => { } : 0;
-
 ;// CONCATENATED MODULE: ./src/starter/analytics.js
-function initAnalytics() {
+const initAnalytics =  false ? 0 : () => {
   var ga = document.createElement('script');
   ga.type = 'text/javascript';
   ga.async = true;
@@ -10336,8 +10335,7 @@ function initAnalytics() {
     gtag('js', new Date());
     gtag('config', 'G-RTVTXF347C');
   });
-}
-;
+};
 ;// CONCATENATED MODULE: ./src/starter/game.ts
 
 
@@ -10379,33 +10377,349 @@ const gameStarter = () => {
     debug('M1Pro game boot done');
 };
 
-;// CONCATENATED MODULE: ./src/util/page-hooker.ts
+;// CONCATENATED MODULE: ./src/components/games-filter.ts
+var games_filter_decorate = (undefined && undefined.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
 
-class PageHooker {
+
+class FilterGroup {
     constructor() {
-        this.hooks = new Map();
+        this.limited = false;
     }
-    add(predicate, handler) {
-        this.hooks.set(predicate, handler);
+}
+var FilterTriValue;
+(function (FilterTriValue) {
+    FilterTriValue[FilterTriValue["Exclude"] = -1] = "Exclude";
+    FilterTriValue[FilterTriValue["Unset"] = 0] = "Unset";
+    FilterTriValue[FilterTriValue["Include"] = 1] = "Include";
+})(FilterTriValue || (FilterTriValue = {}));
+const filterTests = {
+    friends: r => false,
+    teams: r => r.game_2x2 === 1,
+    no_timers: r => r.settings.game_timers === 0,
+    regular: r => r.game_submode === 0,
+    speddie: r => r.game_submode === 2,
+    retro: r => r.game_submode === 4,
+    disposition: r => { var _a; return ((_a = r.flags) === null || _a === void 0 ? void 0 : _a.disposition_mode) > 0; },
+    roulette: r => r.game_submode === 3,
+    park: r => r.settings.br_corner === 0,
+    croulette: r => r.settings.br_corner === 1,
+    jackpot: r => r.settings.br_corner === 2,
+    wormhole: r => r.settings.br_corner === 3,
+};
+let GamesFilter = class GamesFilter extends (external_Vue_default()) {
+    constructor() {
+        super(...arguments);
+        this.filters = {
+            purpose: {
+                name: 'Общее',
+                sub: {
+                    // friends: 'Друзья',
+                    teams: '2x2',
+                    no_timers: 'Без таймеров'
+                }
+            },
+            type: {
+                name: 'Тип',
+                limited: true,
+                sub: {
+                    regular: 'Обычная',
+                    speddie: 'Быстрая',
+                    retro: 'Ретро',
+                    disposition: 'Расклад',
+                    roulette: 'Русская рулетка'
+                }
+            },
+            corner: {
+                name: 'Угловое поле',
+                limited: true,
+                sub: {
+                    jackpot: 'Джекпот',
+                    wormhole: 'Портал',
+                    croulette: 'Рулетка',
+                    park: 'Парк'
+                }
+            }
+        };
+        this.values = null;
     }
-    run() {
-        __webpack_require__("./src/util/history.js");
-        window.addEventListener('locationchange', () => {
-            debug('loc change', location);
-            this.check(true);
+    created() {
+        this.values = JSON.parse(localStorage.getItem('gamebox-filter') || '{}');
+        /* setInterval(() => {
+            debug('filter watchers', (<any>this)._watchers?.length);
+        }, 5000); */
+    }
+    checkRoom(v) {
+        let show = true;
+        const result = {};
+        Object.entries(this.values).forEach(([type, value]) => {
+            const matches = filterTests[type](v.room);
+            result[type] = matches;
+            switch (value) {
+                case FilterTriValue.Exclude:
+                    show = show && !matches;
+                    break;
+                case FilterTriValue.Include:
+                    show = show && matches;
+                    break;
+            }
         });
-        this.check(false);
+        // debug(room.get(0), show, result);
+        v.$el.style.display = show ? 'block' : 'none';
     }
-    check(dyn) {
-        this.hooks.forEach((handler, predicate) => {
-            if (predicate(location)) {
-                handler(dyn);
+};
+GamesFilter = games_filter_decorate([
+    vue_class_component_esm({
+        template: `
+        <div class="_noicon dropdown">
+            <div class="dropdown-icon"><icon name="filter"></icon></div>
+            <div class="dropdown-list">
+                <div class="dropdown-group-one" v-for="group in filters" :key="group.name">
+                    <div class="filter-group">{{group.name}}</div>
+                    <div class="_static dropdown-list-one" v-for="(value, name) in group.sub" :key="name">
+                        <div class="col">{{value}}</div>
+                        <div class="col">
+                            <design-triway v-model="values[name]"></design-triway>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `,
+        watch: {
+            values: {
+                handler(vals) {
+                    localStorage.setItem('gamebox-filter', JSON.stringify(vals));
+                },
+                deep: true
+            }
+        }
+    })
+], GamesFilter);
+/* harmony default export */ var games_filter = (GamesFilter);
+
+;// CONCATENATED MODULE: ./src/util/prop-def.ts
+const propDefinedWindow = (name) => {
+    return propDefined(window, name);
+};
+const propDefined = (obj, name, timeoutms = 3000) => {
+    return new Promise((resolve, reject) => {
+        const timeout = timeoutms && setTimeout(() => {
+            reject(`no var ${name} spawned`);
+        }, timeoutms);
+        Object.defineProperty(obj, name, {
+            configurable: true,
+            set(v) {
+                Object.defineProperty(obj, name, { configurable: true, enumerable: true, writable: true, value: v });
+                timeoutms && clearTimeout(timeout);
+                resolve(v);
+            }
+        });
+    });
+};
+const propWaitWindow = (name) => {
+    return propWait(window, name);
+};
+const propWait = (obj, name, timeoutms = 3000) => {
+    return new Promise((resolve, reject) => {
+        const i = setInterval(() => {
+            timeoutms && clearTimeout(timeout);
+            name in obj && (clearInterval(i), resolve(obj[name]));
+        }, 100);
+        const timeout = timeoutms && setTimeout(() => {
+            clearInterval(i);
+            reject(`no var ${name} spawned`);
+        }, timeoutms);
+    });
+};
+
+;// CONCATENATED MODULE: ./src/util/http-util.ts
+const handleResponse = (resolve, callable) => {
+    return (res) => {
+        const def = $.Deferred();
+        if (res.code) {
+            if (res.code === 8) {
+                return window.require.async('/js/vuem/Captcha.js').then(() => {
+                    return window._libs.dialog.show({ component: "captcha", buttons: [{ is_default: true, title: "Отмена" }] })
+                        .then((tkn) => callable(tkn));
+                });
+            }
+            return def.reject(res);
+        }
+        else {
+            return def.resolve(res.data).then(resolve);
+        }
+    };
+};
+
+;// CONCATENATED MODULE: ./src/components/main-state.ts
+var main_state_decorate = (undefined && undefined.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+
+
+
+
+
+
+class ModeCustomSettings {
+}
+class GamesNewSettings {
+    constructor() {
+        this.custom = {};
+    }
+}
+let MainState = class MainState extends (external_Vue_default()) {
+    constructor() {
+        super(...arguments);
+        this.lots = null;
+        this.itemPrices = new Map();
+        this.lastSeen = localStorage.getItem('last_pro_version_seen') || '0';
+        this.gamesNewSettings = null;
+        this.ver = "1.0.2a";
+        this.listeners = new Map();
+    }
+    created() {
+        const localSettings = localStorage.getItem('games_new_settings');
+        this.gamesNewSettings = localSettings ? JSON.parse(localSettings) : new GamesNewSettings();
+        this.$watch('gamesNewSettings', (v) => {
+            localStorage.setItem('games_new_settings', JSON.stringify(this.gamesNewSettings));
+        }, { deep: true });
+        if (window.API && window.API.isUserSignedIn()) {
+            this.loadLots();
+        }
+        else {
+            propWaitWindow('API').then(v => {
+                const oldCallMethod = window.API.callMethod;
+                window.API.callMethod = (name, ...other) => {
+                    let fn, data = {}, a = {};
+                    switch (typeof other[0]) {
+                        case "function":
+                            [fn, a] = other;
+                            break;
+                        case "object":
+                            [data, fn, a] = other;
+                            break;
+                        case "undefined":
+                            break;
+                        default:
+                            throw new Error("Invalid params given.");
+                    }
+                    return oldCallMethod.call(window.API, name, data, (...data) => {
+                        fn && fn.apply(null, data);
+                        this.listeners.forEach((v, k) => {
+                            if (k === name) {
+                                if (v.apply(null, data)) {
+                                    this.listeners.delete(name);
+                                }
+                            }
+                        });
+                    }, a);
+                };
+                this.loadLots();
+            });
+        }
+        setInterval(() => {
+            this.loadLots();
+        }, 60 * 1000);
+    }
+    onCallMethod(name, fn) {
+        this.listeners.set(name, fn);
+    }
+    changeSeen() {
+        this.lastSeen = this.ver;
+        localStorage.setItem('last_pro_version_seen', this.ver);
+    }
+    loadLots() {
+        $.post('/api/market.getMyLots', new MarketLotsReq())
+            .then((res) => {
+            if (res.code) {
+                throw res;
+            }
+            else {
+                this.lots = res.data;
+            }
+        }).fail(err => console.error(err));
+    }
+    getSingleMarketListing(id) {
+        return $.post('/api/market.getListing', new MarketListingReq(id, 1))
+            .then((res) => {
+            var _a, _b;
+            const def = $.Deferred();
+            if (res.code || !((_b = (_a = res.data) === null || _a === void 0 ? void 0 : _a.things) === null || _b === void 0 ? void 0 : _b.length)) {
+                return def.reject(res);
+            }
+            else {
+                return def.resolve(res.data.things[0]);
             }
         });
     }
-}
-const pooker = new PageHooker();
-/* harmony default export */ var page_hooker = (pooker);
+    getUserInfo(id, ids = [], type) {
+        return $.post('/api/users.get', new UsersGetReq(type, id, ids.length ? ids.join(',') : ids))
+            .then((res) => {
+            var _a;
+            const def = $.Deferred();
+            if (res.code || !((_a = res.data) === null || _a === void 0 ? void 0 : _a.length)) {
+                return def.reject(res);
+            }
+            else {
+                return def.resolve(res.data);
+            }
+        });
+    }
+    getFriends(req) {
+        return $.post('/api/friends.get', req)
+            .then((res) => {
+            const def = $.Deferred();
+            if (res.code) {
+                return def.reject(res);
+            }
+            else {
+                return def.resolve(res.data);
+            }
+        });
+    }
+    getItemPrice(id) {
+        if (!this.itemPrices.has(id)) {
+            this.itemPrices.set(id, this.getSingleMarketListing(`${id}`).then(thing => thing.price));
+        }
+        return this.itemPrices.get(id);
+    }
+    isUnseen(version) {
+        return version.localeCompare(this.lastSeen, undefined, { numeric: true, sensitivity: 'base' }) > 0;
+    }
+    changeSetting(roomId, name, value, token) {
+        return $.post('/api/rooms.settingsChange', new RoomsChangeSettings(roomId, name, value).withCaptcha(token))
+            .then(handleResponse(() => true, tkn => this.changeSetting(roomId, name, value, tkn)))
+            .fail(e => console.error('failed to change setting', name, 'code', e));
+    }
+    setCustomSetting(mode, opt, v) {
+        const custom = this.gamesNewSettings.custom;
+        debug('set opt', mode, opt, JSON.parse(JSON.stringify(v)));
+        if (custom[mode]) {
+            external_Vue_default().set(custom[mode], opt, v);
+        }
+        else {
+            const val = {};
+            val[opt] = v;
+            external_Vue_default().set(custom, mode, val);
+        }
+    }
+};
+MainState = main_state_decorate([
+    vue_class_component_esm({})
+], MainState);
+/* harmony default export */ var main_state = (MainState);
+
+;// CONCATENATED MODULE: ./src/hooks/experimental/expmain.ts
+const expmain =  true ? (state) => { } : 0;
 
 ;// CONCATENATED MODULE: ./src/hooks/main/collapse-block.ts
 class CollapseBlock {
@@ -10437,6 +10751,11 @@ class CollapseBlock {
     }
 }
 
+;// CONCATENATED MODULE: ./CHANGELOG.md
+// Module
+var code = "<h2>m1pro Release History</h2> <h4>21-Nov-2022 - <strong>1.0.2</strong></h4> <p>Исправлена инициализация расширения после обновления сайта.</p> <p>Другое:</p> <ul> <li>Исправлена недоступность обновления для браузера Mozilla Firefox.</li> <li>Исправлены кнопки на банерах.</li> </ul> <h4>11-Jul-2022 - <strong>1.0.1</strong></h4> <p>Количество установок из Chrome Web Store перевалило за тысячу! В связи с этим хотелось бы порадовать вас небольшим обновлением.</p> <p>Другое:</p> <ul> <li>Добалено: ссылка на Discord сообщество, ссылка на Google форму для сбора обратной связи и блок для пожертвований в окно информации о расширении. <blockquote> <p>Проект существует на безвозмездной основе и энтузиазме разработчика, но любая разработка требует времени, которое есть не всегда ввиду личных обстоятельств. Также в проекте не задействована реклама (и не будет), но некоторые вещи требуют расходов. Например, было несколько предложений, которые требуют для реализации наличия серверной составляющей, или публикация расширения в магазине для Safari на iPhone требует платной учетной записи разработчика. Чтобы сделать такие функции возможными в будущем, а также повысить мотивацию активно заниматься данным проектом, мы запускаем сбор пожертвований на развитие проекта.</p> </blockquote> </li> <li>Добавлен банер на главную страницу. <blockquote> <p>Банер можно скрыть навсегда, если мешает. Кнопка появится после нажатия \"Показать как\".</p> </blockquote> </li> <li>Исправлено: неверное позиционирование оповещения о приглашении в игру, найденном матче и тд.</li> </ul> <p>Игра:</p> <ul> <li>Добавлен счетик дублей и оставшихся бросков до выхода из тюрьмы на фишке игрока.</li> <li>Улучшено: раскрыты случайные значения вариантов поля \"Шанс\".</li> <li>Улучшено: при рестартах выключенные поля включаются снова.</li> <li>Улучшено: отображение подсветки полей перехода по кубику М1 не показывается при попадании в тюрьму.</li> <li>Улучшено: включено отображение подсветки полей перехода при выборе поля после броска с автобусом или триплом.</li> <li>Улучшено: отображение подсветки полей перехода не отображается при обычных бросках из тюрьмы (переход отобразится только при бросках, которые приводят к выходу из тюрьмы).</li> <li>Улучшено: убраны приписки \"k\" возле цен в чате игры.</li> <li>Исправлено: при рестартах не обновлялись варианты поля \"Шанс\".</li> <li>Исправлено: цена выхода из тюрьмы не учитывалась в расходах.</li> <li>Исправлено: эффект \"Пропуск хода\" не исчезал на нужном раунде в некоторых случаях.</li> </ul> <h4>22-Apr-2022 - <strong>1.0.0</strong></h4> <p>Игра:</p> <ul> <li>Добавлено отображение оставшихся вариантов попадания на поле \"Шанс\" в дополнительном блоке справа.</li> <li>Добавлена подсветка полей при ходе любого игрока, полей при перемещении по М1, а также доступного выбора из нескольких вариантов. Доступные варианты хода чужих телепортов тоже подсвечиваются.</li> <li>Добавлено отображение чужих договоров в live режиме (можно отключить в настройках) и список всех договоров в течение игры.</li> <li>Добавлено отображение выпавшего варианта при попадании на поле \"Шанс\".</li> <li>Добавлена настройка для возможности отключения функции \"Свой цвет всегда красный\".</li> <li>Улучшена общая статистика игры в дополнительном блоке справа, а также добавлена информация о следующем модификаторе прохода круга и оставшееся до его примения время.</li> <li>В окно договора добавлены кнопки для корректировки двойной цены в обе стороны.</li> <li>Кроме кнопки постройки филиала добавлены также кнопки для уменьшения уровня, заклада, выкупа, в том числе две специальные кнопки: перезаклад (для всех режимов) и быстрая постройка (доступна только на втором раунде режима \"Расклад\").</li> <li>Любое свободное поле можно отметить как \"выключенное\" (отмечается серым цветом). Выключенные поля это такие поля, которые вы не хотите покупать. При попадании на такое поле оно будет автоматически выставляться на аукцион, аналогично, при предложении покупки такого поля на аукционе будет отклоняться автоматически.</li> <li>Добавлено отображение эффектов \"Пропуск хода\" и \"Ход назад\" на фишке игрока.</li> </ul> <p>Другое:</p> <ul> <li>Исправлен редкий баг, при котором не отображалось подтверждение принятия матча в соревновательном режиме.</li> <li>Исправлена страница профиля.</li> <li>Цены на предметах в инвентаре теперь отображаются корректно при сортировке и фильтрах.</li> <li>Для отображения ранга теперь используются стандартные картинки из игры.</li> <li>Возвращено отображение кнопок игнора и подачи жалобы на игрока, который уже проиграл.</li> </ul> <h4>19-Dec-2021 - <strong>0.3.1</strong></h4> <p>Игра:</p> <ul> <li>В интерфейс договора добавлена информация о требуемой оплате текущих расходов. <blockquote> <p>Данная информация включает сумму требуемую для оплаты, а также состояние (нехватка или остаток) после оплаты текущих расходов с учетом оформляемого договора как без учета полей в наличии (только на основе имеющихся денег), так и с учетом стоимости заклада полей.</p> </blockquote> </li> </ul> <p>Другое:</p> <ul> <li>Исправлено множество ошибок связанных с обновлением сайта.</li> </ul> <h4>30-Nov-2021 - <strong>0.3.0</strong></h4> <p>Игра:</p> <ul> <li>Добавлена кнопка рядом с каждым полем для постройки филиала.</li> <li>В интерфейс договора добавлена кнопка для уравнения общей суммы.</li> <li>Исправлено отображение статуса кредита.</li> <li>Добавлено отображение доходов и расходов в дополнительной информации каждого игрока.</li> </ul> <h4>21-Nov-2021 - <strong>0.2.1</strong></h4> <p>Игра:</p> <ul> <li>Добавлена настройка \"Показывать общую статистику в отдельном блоке\"</li> </ul> <h4>20-Nov-2021 - <strong>0.2.0</strong></h4> <p>Игра:</p> <ul> <li>Общая статистка игры (тип и время игры, количество зрителей, раунд и круговой доход) теперь выводится в дополнительном блоке справа. <blockquote> <p>Данный блок доступен при достаточной ширине видимой области страницы, если ширины недостаточно, то статистика доступна как и раньше, по клику на <strong>ion-chevron-up</strong></p> </blockquote> </li> <li>Детальная статистика игры дополнена количеством пройденных кругов и прибылью для каждого игрока. <blockquote> <p>Прибылью является разница между полученными и утраченными активами, которые не зависят от приобретенных полей других игроков, например, проход круга, победа в конкурсе красоты, оплата налогов, ставки на рулетку, джекпот или открытие портала, затраты на выход из тюрьмы, получение и возврат кредита и тд. Зеленый цвет означает положительную прибыль, а красный отрицательную. При наведении на прибыль можно увидеть подробные значения полученных и утраченных активов.</p> </blockquote> </li> <li>В карточке игрока добавлена информация: рейтинг, предыдущие баны MFP, пол, статус дружбы.</li> <li>При наведении на <strong>ion-plus-circled</strong> в карточке игрока добавлен вывод информации: счет, количество игр/побед, процент побед.</li> <li>Включено отображение стоимости полей, которые можно заложить, для всех режимов (<strong>ion-ios-cart</strong> в карточке игрока).</li> <li>Для режима 2 на 2 добавлено отображение свободных активов команды (<strong>ion-ios-cart</strong> в блоке между командами). Свободные активы включают деньги обоих игроков и поля, которые можно передать.</li> </ul> <p>Другое:</p> <ul> <li>Добавлена информация об игре и расширении.</li> <li>Чат: добавлена возможность показать скрытые ранее сообщения (в настройках), а у скрытых сообщений появилась возможность убрать игнор.</li> <li>Поиск игр: добавлено определение кто у кого находится в друзьях в созданной игре. <blockquote> <p>В иконках у игрока появляется <strong>ion-person-stalker</strong> с цветом того игрока, другом которого он является.</p> </blockquote> </li> <li>Поиск игр: добавлен вывод забаненых <strong>ion-ios-close</strong> и приглашенных игроков <strong>ion-person-add</strong> в созданной игре.</li> <li>Создание новой игры: добавлено сохранение выбранных настроек при создании игровой комнаты. <blockquote> <p>Сохраняемые настройки включают последний выбранный режим игры, список выбранных режимов для соревновательной игры, а так же следующие опции для каждого режима по отдельности:</p> <ul> <li>Количество игроков.</li> <li>Приватная комната.</li> <li>Автостарт игры.</li> <li>Рестарты (при выборе 2 на 2 в быстрой игре).</li> <li>Таймеры.</li> <li>Угловое поле.</li> </ul> </blockquote> </li> </ul> <h4>07-Nov-2021 - <strong>0.1.3</strong></h4> <ul> <li>Косметические исправления для списка друзей и главной страницы.</li> </ul> <h4>05-Nov-2021 - <strong>0.1.2</strong></h4> <ul> <li>First alpha release.</li> </ul> ";
+// Exports
+/* harmony default export */ var CHANGELOG = (code);
 // EXTERNAL MODULE: ./node_modules/css-loader/dist/cjs.js!./node_modules/less-loader/dist/cjs.js!./src/style/info.less
 var info = __webpack_require__("./node_modules/css-loader/dist/cjs.js!./node_modules/less-loader/dist/cjs.js!./src/style/info.less");
 ;// CONCATENATED MODULE: ./src/style/info.less
@@ -10468,11 +10787,6 @@ var info_update = injectStylesIntoStyleTag_default()(info/* default */.Z, info_o
 
        /* harmony default export */ var style_info = (info/* default */.Z && info/* default.locals */.Z.locals ? info/* default.locals */.Z.locals : undefined);
 
-;// CONCATENATED MODULE: ./CHANGELOG.md
-// Module
-var code = "<h2>m1pro Release History</h2> <h4>11-Jul-2022 - <strong>1.0.1</strong></h4> <p>Количество установок из Chrome Web Store перевалило за тысячу! В связи с этим хотелось бы порадовать вас небольшим обновлением.</p> <p>Другое:</p> <ul> <li>Добалено: ссылка на Discord сообщество, ссылка на Google форму для сбора обратной связи и блок для пожертвований в окно информации о расширении. <blockquote> <p>Проект существует на безвозмездной основе и энтузиазме разработчика, но любая разработка требует времени, которое есть не всегда ввиду личных обстоятельств. Также в проекте не задействована реклама (и не будет), но некоторые вещи требуют расходов. Например, было несколько предложений, которые требуют для реализации наличия серверной составляющей, или публикация расширения в магазине для Safari на iPhone требует платной учетной записи разработчика. Чтобы сделать такие функции возможными в будущем, а также повысить мотивацию активно заниматься данным проектом, мы запускаем сбор пожертвований на развитие проекта.</p> </blockquote> </li> <li>Добавлен банер на главную страницу. <blockquote> <p>Банер можно скрыть навсегда, если мешает. Кнопка появится после нажатия \"Показать как\".</p> </blockquote> </li> <li>Исправлено: неверное позиционирование оповещения о приглашении в игру, найденном матче и тд.</li> </ul> <p>Игра:</p> <ul> <li>Добавлен счетик дублей и оставшихся бросков до выхода из тюрьмы на фишке игрока.</li> <li>Улучшено: раскрыты случайные значения вариантов поля \"Шанс\".</li> <li>Улучшено: при рестартах выключенные поля включаются снова.</li> <li>Улучшено: отображение подсветки полей перехода по кубику М1 не показывается при попадании в тюрьму.</li> <li>Улучшено: включено отображение подсветки полей перехода при выборе поля после броска с автобусом или триплом.</li> <li>Улучшено: отображение подсветки полей перехода не отображается при обычных бросках из тюрьмы (переход отобразится только при бросках, которые приводят к выходу из тюрьмы).</li> <li>Улучшено: убраны приписки \"k\" возле цен в чате игры.</li> <li>Исправлено: при рестартах не обновлялись варианты поля \"Шанс\".</li> <li>Исправлено: цена выхода из тюрьмы не учитывалась в расходах.</li> <li>Исправлено: эффект \"Пропуск хода\" не исчезал на нужном раунде в некоторых случаях.</li> </ul> <h4>22-Apr-2022 - <strong>1.0.0</strong></h4> <p>Игра:</p> <ul> <li>Добавлено отображение оставшихся вариантов попадания на поле \"Шанс\" в дополнительном блоке справа.</li> <li>Добавлена подсветка полей при ходе любого игрока, полей при перемещении по М1, а также доступного выбора из нескольких вариантов. Доступные варианты хода чужих телепортов тоже подсвечиваются.</li> <li>Добавлено отображение чужих договоров в live режиме (можно отключить в настройках) и список всех договоров в течение игры.</li> <li>Добавлено отображение выпавшего варианта при попадании на поле \"Шанс\".</li> <li>Добавлена настройка для возможности отключения функции \"Свой цвет всегда красный\".</li> <li>Улучшена общая статистика игры в дополнительном блоке справа, а также добавлена информация о следующем модификаторе прохода круга и оставшееся до его примения время.</li> <li>В окно договора добавлены кнопки для корректировки двойной цены в обе стороны.</li> <li>Кроме кнопки постройки филиала добавлены также кнопки для уменьшения уровня, заклада, выкупа, в том числе две специальные кнопки: перезаклад (для всех режимов) и быстрая постройка (доступна только на втором раунде режима \"Расклад\").</li> <li>Любое свободное поле можно отметить как \"выключенное\" (отмечается серым цветом). Выключенные поля это такие поля, которые вы не хотите покупать. При попадании на такое поле оно будет автоматически выставляться на аукцион, аналогично, при предложении покупки такого поля на аукционе будет отклоняться автоматически.</li> <li>Добавлено отображение эффектов \"Пропуск хода\" и \"Ход назад\" на фишке игрока.</li> </ul> <p>Другое:</p> <ul> <li>Исправлен редкий баг, при котором не отображалось подтверждение принятия матча в соревновательном режиме.</li> <li>Исправлена страница профиля.</li> <li>Цены на предметах в инвентаре теперь отображаются корректно при сортировке и фильтрах.</li> <li>Для отображения ранга теперь используются стандартные картинки из игры.</li> <li>Возвращено отображение кнопок игнора и подачи жалобы на игрока, который уже проиграл.</li> </ul> <h4>19-Dec-2021 - <strong>0.3.1</strong></h4> <p>Игра:</p> <ul> <li>В интерфейс договора добавлена информация о требуемой оплате текущих расходов. <blockquote> <p>Данная информация включает сумму требуемую для оплаты, а также состояние (нехватка или остаток) после оплаты текущих расходов с учетом оформляемого договора как без учета полей в наличии (только на основе имеющихся денег), так и с учетом стоимости заклада полей.</p> </blockquote> </li> </ul> <p>Другое:</p> <ul> <li>Исправлено множество ошибок связанных с обновлением сайта.</li> </ul> <h4>30-Nov-2021 - <strong>0.3.0</strong></h4> <p>Игра:</p> <ul> <li>Добавлена кнопка рядом с каждым полем для постройки филиала.</li> <li>В интерфейс договора добавлена кнопка для уравнения общей суммы.</li> <li>Исправлено отображение статуса кредита.</li> <li>Добавлено отображение доходов и расходов в дополнительной информации каждого игрока.</li> </ul> <h4>21-Nov-2021 - <strong>0.2.1</strong></h4> <p>Игра:</p> <ul> <li>Добавлена настройка \"Показывать общую статистику в отдельном блоке\"</li> </ul> <h4>20-Nov-2021 - <strong>0.2.0</strong></h4> <p>Игра:</p> <ul> <li>Общая статистка игры (тип и время игры, количество зрителей, раунд и круговой доход) теперь выводится в дополнительном блоке справа. <blockquote> <p>Данный блок доступен при достаточной ширине видимой области страницы, если ширины недостаточно, то статистика доступна как и раньше, по клику на <strong>ion-chevron-up</strong></p> </blockquote> </li> <li>Детальная статистика игры дополнена количеством пройденных кругов и прибылью для каждого игрока. <blockquote> <p>Прибылью является разница между полученными и утраченными активами, которые не зависят от приобретенных полей других игроков, например, проход круга, победа в конкурсе красоты, оплата налогов, ставки на рулетку, джекпот или открытие портала, затраты на выход из тюрьмы, получение и возврат кредита и тд. Зеленый цвет означает положительную прибыль, а красный отрицательную. При наведении на прибыль можно увидеть подробные значения полученных и утраченных активов.</p> </blockquote> </li> <li>В карточке игрока добавлена информация: рейтинг, предыдущие баны MFP, пол, статус дружбы.</li> <li>При наведении на <strong>ion-plus-circled</strong> в карточке игрока добавлен вывод информации: счет, количество игр/побед, процент побед.</li> <li>Включено отображение стоимости полей, которые можно заложить, для всех режимов (<strong>ion-ios-cart</strong> в карточке игрока).</li> <li>Для режима 2 на 2 добавлено отображение свободных активов команды (<strong>ion-ios-cart</strong> в блоке между командами). Свободные активы включают деньги обоих игроков и поля, которые можно передать.</li> </ul> <p>Другое:</p> <ul> <li>Добавлена информация об игре и расширении.</li> <li>Чат: добавлена возможность показать скрытые ранее сообщения (в настройках), а у скрытых сообщений появилась возможность убрать игнор.</li> <li>Поиск игр: добавлено определение кто у кого находится в друзьях в созданной игре. <blockquote> <p>В иконках у игрока появляется <strong>ion-person-stalker</strong> с цветом того игрока, другом которого он является.</p> </blockquote> </li> <li>Поиск игр: добавлен вывод забаненых <strong>ion-ios-close</strong> и приглашенных игроков <strong>ion-person-add</strong> в созданной игре.</li> <li>Создание новой игры: добавлено сохранение выбранных настроек при создании игровой комнаты. <blockquote> <p>Сохраняемые настройки включают последний выбранный режим игры, список выбранных режимов для соревновательной игры, а так же следующие опции для каждого режима по отдельности:</p> <ul> <li>Количество игроков.</li> <li>Приватная комната.</li> <li>Автостарт игры.</li> <li>Рестарты (при выборе 2 на 2 в быстрой игре).</li> <li>Таймеры.</li> <li>Угловое поле.</li> </ul> </blockquote> </li> </ul> <h4>07-Nov-2021 - <strong>0.1.3</strong></h4> <ul> <li>Косметические исправления для списка друзей и главной страницы.</li> </ul> <h4>05-Nov-2021 - <strong>0.1.2</strong></h4> <ul> <li>First alpha release.</li> </ul> ";
-// Exports
-/* harmony default export */ var CHANGELOG = (code);
 ;// CONCATENATED MODULE: ./src/components/info.ts
 
 
@@ -10490,7 +10804,7 @@ const opts = {
             <div class="Info-content">
                 <div class="Info-main" :class='{selected: !showPro}'></div>
                 <div class="Info-pro" :class='{selected: showPro}'>
-                    <div class="Info-pro-head">Текущая версия: ${"1.0.1a"}</div>
+                    <div class="Info-pro-head">Текущая версия: ${"1.0.2a"}</div>
                     <div class="Info-pro-general">
                             <div class="_community">
                                 Сообщество для обсуждения: 
@@ -10585,9 +10899,9 @@ const opts = {
         this.state.$watch('lastSeen', () => {
             jq.find('div.badge').hide();
         });
-        if (this.state.isUnseen("1.0.1a")) {
+        if (this.state.isUnseen("1.0.2a")) {
             jq.find('div.badge').show();
-            jq.find('div.Info-pro-history h3 > strong').each((i, el) => {
+            jq.find('div.Info-pro-history h4 > strong').each((i, el) => {
                 const jel = jQuery(el);
                 if (this.state.isUnseen(jel.text())) {
                     jel.addClass('newver');
@@ -10692,7 +11006,7 @@ class HeaderMenu {
         return jQuery(`.header-menu a[href="/${link}"] span`).clone();
     }
     checkVersion() {
-        this.state.isUnseen("1.0.1a") ? this.verBadge.show() : this.verBadge.hide();
+        this.state.isUnseen("1.0.2a") ? this.verBadge.show() : this.verBadge.hide();
     }
 }
 
@@ -11311,350 +11625,6 @@ class Adaptive {
     }
 }
 
-;// CONCATENATED MODULE: ./src/util/prop-def.ts
-const propDefinedWindow = (name) => {
-    return propDefined(window, name);
-};
-const propDefined = (obj, name, timeoutms = 3000) => {
-    return new Promise((resolve, reject) => {
-        const timeout = timeoutms && setTimeout(() => {
-            reject(`no var ${name} spawned`);
-        }, timeoutms);
-        Object.defineProperty(obj, name, {
-            configurable: true,
-            set(v) {
-                Object.defineProperty(obj, name, { configurable: true, enumerable: true, writable: true, value: v });
-                timeoutms && clearTimeout(timeout);
-                resolve(v);
-            }
-        });
-    });
-};
-const propWaitWindow = (name) => {
-    return propWait(window, name);
-};
-const propWait = (obj, name, timeoutms = 3000) => {
-    return new Promise((resolve, reject) => {
-        const i = setInterval(() => {
-            timeoutms && clearTimeout(timeout);
-            name in obj && (clearInterval(i), resolve(obj[name]));
-        }, 100);
-        const timeout = timeoutms && setTimeout(() => {
-            clearInterval(i);
-            reject(`no var ${name} spawned`);
-        }, timeoutms);
-    });
-};
-
-;// CONCATENATED MODULE: ./src/util/http-util.ts
-const handleResponse = (resolve, callable) => {
-    return (res) => {
-        const def = $.Deferred();
-        if (res.code) {
-            if (res.code === 8) {
-                return window.require.async('/js/vuem/Captcha.js').then(() => {
-                    return window._libs.dialog.show({ component: "captcha", buttons: [{ is_default: true, title: "Отмена" }] })
-                        .then((tkn) => callable(tkn));
-                });
-            }
-            return def.reject(res);
-        }
-        else {
-            return def.resolve(res.data).then(resolve);
-        }
-    };
-};
-
-;// CONCATENATED MODULE: ./src/components/main-state.ts
-var main_state_decorate = (undefined && undefined.__decorate) || function (decorators, target, key, desc) {
-    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
-    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
-    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
-    return c > 3 && r && Object.defineProperty(target, key, r), r;
-};
-
-
-
-
-
-
-class ModeCustomSettings {
-}
-class GamesNewSettings {
-    constructor() {
-        this.custom = {};
-    }
-}
-let MainState = class MainState extends (external_Vue_default()) {
-    constructor() {
-        super(...arguments);
-        this.lots = null;
-        this.itemPrices = new Map();
-        this.lastSeen = localStorage.getItem('last_pro_version_seen') || '0';
-        this.gamesNewSettings = null;
-        this.ver = "1.0.1a";
-        this.listeners = new Map();
-    }
-    created() {
-        const localSettings = localStorage.getItem('games_new_settings');
-        this.gamesNewSettings = localSettings ? JSON.parse(localSettings) : new GamesNewSettings();
-        this.$watch('gamesNewSettings', (v) => {
-            localStorage.setItem('games_new_settings', JSON.stringify(this.gamesNewSettings));
-        }, { deep: true });
-        if (window.API && window.API.isUserSignedIn()) {
-            this.loadLots();
-        }
-        else {
-            propWaitWindow('API').then(v => {
-                const oldCallMethod = window.API.callMethod;
-                window.API.callMethod = (name, ...other) => {
-                    let fn, data = {}, a = {};
-                    switch (typeof other[0]) {
-                        case "function":
-                            [fn, a] = other;
-                            break;
-                        case "object":
-                            [data, fn, a] = other;
-                            break;
-                        case "undefined":
-                            break;
-                        default:
-                            throw new Error("Invalid params given.");
-                    }
-                    return oldCallMethod.call(window.API, name, data, (...data) => {
-                        fn && fn.apply(null, data);
-                        this.listeners.forEach((v, k) => {
-                            if (k === name) {
-                                if (v.apply(null, data)) {
-                                    this.listeners.delete(name);
-                                }
-                            }
-                        });
-                    }, a);
-                };
-                this.loadLots();
-            });
-        }
-        setInterval(() => {
-            this.loadLots();
-        }, 60 * 1000);
-    }
-    onCallMethod(name, fn) {
-        this.listeners.set(name, fn);
-    }
-    changeSeen() {
-        this.lastSeen = this.ver;
-        localStorage.setItem('last_pro_version_seen', this.ver);
-    }
-    loadLots() {
-        $.post('/api/market.getMyLots', new MarketLotsReq())
-            .then((res) => {
-            if (res.code) {
-                throw res;
-            }
-            else {
-                this.lots = res.data;
-            }
-        }).fail(err => console.error(err));
-    }
-    getSingleMarketListing(id) {
-        return $.post('/api/market.getListing', new MarketListingReq(id, 1))
-            .then((res) => {
-            var _a, _b;
-            const def = $.Deferred();
-            if (res.code || !((_b = (_a = res.data) === null || _a === void 0 ? void 0 : _a.things) === null || _b === void 0 ? void 0 : _b.length)) {
-                return def.reject(res);
-            }
-            else {
-                return def.resolve(res.data.things[0]);
-            }
-        });
-    }
-    getUserInfo(id, ids = [], type) {
-        return $.post('/api/users.get', new UsersGetReq(type, id, ids.length ? ids.join(',') : ids))
-            .then((res) => {
-            var _a;
-            const def = $.Deferred();
-            if (res.code || !((_a = res.data) === null || _a === void 0 ? void 0 : _a.length)) {
-                return def.reject(res);
-            }
-            else {
-                return def.resolve(res.data);
-            }
-        });
-    }
-    getFriends(req) {
-        return $.post('/api/friends.get', req)
-            .then((res) => {
-            const def = $.Deferred();
-            if (res.code) {
-                return def.reject(res);
-            }
-            else {
-                return def.resolve(res.data);
-            }
-        });
-    }
-    getItemPrice(id) {
-        if (!this.itemPrices.has(id)) {
-            this.itemPrices.set(id, this.getSingleMarketListing(`${id}`).then(thing => thing.price));
-        }
-        return this.itemPrices.get(id);
-    }
-    isUnseen(version) {
-        return version.localeCompare(this.lastSeen, undefined, { numeric: true, sensitivity: 'base' }) > 0;
-    }
-    changeSetting(roomId, name, value, token) {
-        return $.post('/api/rooms.settingsChange', new RoomsChangeSettings(roomId, name, value).withCaptcha(token))
-            .then(handleResponse(() => true, tkn => this.changeSetting(roomId, name, value, tkn)))
-            .fail(e => console.error('failed to change setting', name, 'code', e));
-    }
-    setCustomSetting(mode, opt, v) {
-        const custom = this.gamesNewSettings.custom;
-        debug('set opt', mode, opt, JSON.parse(JSON.stringify(v)));
-        if (custom[mode]) {
-            external_Vue_default().set(custom[mode], opt, v);
-        }
-        else {
-            const val = {};
-            val[opt] = v;
-            external_Vue_default().set(custom, mode, val);
-        }
-    }
-};
-MainState = main_state_decorate([
-    vue_class_component_esm({})
-], MainState);
-/* harmony default export */ var main_state = (MainState);
-
-;// CONCATENATED MODULE: ./src/components/games-filter.ts
-var games_filter_decorate = (undefined && undefined.__decorate) || function (decorators, target, key, desc) {
-    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
-    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
-    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
-    return c > 3 && r && Object.defineProperty(target, key, r), r;
-};
-
-
-class FilterGroup {
-    constructor() {
-        this.limited = false;
-    }
-}
-var FilterTriValue;
-(function (FilterTriValue) {
-    FilterTriValue[FilterTriValue["Exclude"] = -1] = "Exclude";
-    FilterTriValue[FilterTriValue["Unset"] = 0] = "Unset";
-    FilterTriValue[FilterTriValue["Include"] = 1] = "Include";
-})(FilterTriValue || (FilterTriValue = {}));
-const filterTests = {
-    friends: r => false,
-    teams: r => r.game_2x2 === 1,
-    no_timers: r => r.settings.game_timers === 0,
-    regular: r => r.game_submode === 0,
-    speddie: r => r.game_submode === 2,
-    retro: r => r.game_submode === 4,
-    disposition: r => { var _a; return ((_a = r.flags) === null || _a === void 0 ? void 0 : _a.disposition_mode) > 0; },
-    roulette: r => r.game_submode === 3,
-    park: r => r.settings.br_corner === 0,
-    croulette: r => r.settings.br_corner === 1,
-    jackpot: r => r.settings.br_corner === 2,
-    wormhole: r => r.settings.br_corner === 3,
-};
-let GamesFilter = class GamesFilter extends (external_Vue_default()) {
-    constructor() {
-        super(...arguments);
-        this.filters = {
-            purpose: {
-                name: 'Общее',
-                sub: {
-                    // friends: 'Друзья',
-                    teams: '2x2',
-                    no_timers: 'Без таймеров'
-                }
-            },
-            type: {
-                name: 'Тип',
-                limited: true,
-                sub: {
-                    regular: 'Обычная',
-                    speddie: 'Быстрая',
-                    retro: 'Ретро',
-                    disposition: 'Расклад',
-                    roulette: 'Русская рулетка'
-                }
-            },
-            corner: {
-                name: 'Угловое поле',
-                limited: true,
-                sub: {
-                    jackpot: 'Джекпот',
-                    wormhole: 'Портал',
-                    croulette: 'Рулетка',
-                    park: 'Парк'
-                }
-            }
-        };
-        this.values = null;
-    }
-    created() {
-        this.values = JSON.parse(localStorage.getItem('gamebox-filter') || '{}');
-        /* setInterval(() => {
-            debug('filter watchers', (<any>this)._watchers?.length);
-        }, 5000); */
-    }
-    checkRoom(v) {
-        let show = true;
-        const result = {};
-        Object.entries(this.values).forEach(([type, value]) => {
-            const matches = filterTests[type](v.room);
-            result[type] = matches;
-            switch (value) {
-                case FilterTriValue.Exclude:
-                    show = show && !matches;
-                    break;
-                case FilterTriValue.Include:
-                    show = show && matches;
-                    break;
-            }
-        });
-        // debug(room.get(0), show, result);
-        v.$el.style.display = show ? 'block' : 'none';
-    }
-};
-GamesFilter = games_filter_decorate([
-    vue_class_component_esm({
-        template: `
-        <div class="_noicon dropdown">
-            <div class="dropdown-icon"><icon name="filter"></icon></div>
-            <div class="dropdown-list">
-                <div class="dropdown-group-one" v-for="group in filters" :key="group.name">
-                    <div class="filter-group">{{group.name}}</div>
-                    <div class="_static dropdown-list-one" v-for="(value, name) in group.sub" :key="name">
-                        <div class="col">{{value}}</div>
-                        <div class="col">
-                            <design-triway v-model="values[name]"></design-triway>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    `,
-        watch: {
-            values: {
-                handler(vals) {
-                    localStorage.setItem('gamebox-filter', JSON.stringify(vals));
-                },
-                deep: true
-            }
-        }
-    })
-], GamesFilter);
-/* harmony default export */ var games_filter = (GamesFilter);
-
-;// CONCATENATED MODULE: ./src/hooks/experimental/expmain.ts
-const expmain =  true ? (state) => { } : 0;
-
 ;// CONCATENATED MODULE: ./src/pages/banner.ts
 
 class Banner {
@@ -11670,6 +11640,20 @@ class Banner {
     init() {
         __webpack_require__("./src/style/main/banner.less");
         const banner = jQuery('<div>').addClass('games-market-list-one _horizontal _m1pro').prependTo('div.games-market-list');
+        // FIXME: the only fcking way to handle this is to return the correct index
+        // $('.games-market-list-one').index() is called twice but we only need to fix index for the case where jquery init context of the is the banner's "button click", other's (right/left button clicks) context is "document"
+        const oldidx = jQuery.fn.index;
+        jQuery.fn.extend({
+            index: function () {
+                const idx = oldidx.call(this);
+                if (this.hasClass('games-market-list-one') && jQuery(this.context).is('button')) {
+                    return idx - 1;
+                }
+                else {
+                    return idx;
+                }
+            }
+        });
         banner.css('background-image', 'linear-gradient(162deg, rgb(0, 0, 0) 28%, rgb(220, 20, 60) 130%');
         const ctr = jQuery('<div>').addClass('_container').appendTo(banner);
         ctr.append(`
@@ -11701,6 +11685,34 @@ class Banner {
         });
     }
 }
+
+;// CONCATENATED MODULE: ./src/util/page-hooker.ts
+
+class PageHooker {
+    constructor() {
+        this.hooks = new Map();
+    }
+    add(predicate, handler) {
+        this.hooks.set(predicate, handler);
+    }
+    run() {
+        __webpack_require__("./src/util/history.js");
+        window.addEventListener('locationchange', () => {
+            debug('loc change', location);
+            this.check(true);
+        });
+        this.check(false);
+    }
+    check(dyn) {
+        this.hooks.forEach((handler, predicate) => {
+            if (predicate(location)) {
+                handler(dyn);
+            }
+        });
+    }
+}
+const pooker = new PageHooker();
+/* harmony default export */ var page_hooker = (pooker);
 
 ;// CONCATENATED MODULE: ./src/starter/main.ts
 
@@ -11734,9 +11746,13 @@ const mainStarter = () => {
     vue_hooker.ifMount(jq => jq.is('div.Gchat'), v => new Chat(v, state));
     vue_hooker.ifMount((jq, v) => v.$options.name === 'inventory2', v => __webpack_require__("./src/style/main/inventory.less"));
     vue_hooker.ifMount(jq => jq.is('div.Item'), v => new item_Item(v, state));
-    const filter = new games_filter();
-    vue_hooker.ifMount(jq => jq.is('div.VueGamesRooms'), v => new GamesRooms(v, filter));
-    vue_hooker.ifMount(jq => jq.is('div.VueGamesRoomsOne'), v => new GamesRoomsOne(v, filter, state));
+    let filter = null;
+    const getFilter = () => {
+        !filter && (filter = new games_filter());
+        return filter;
+    };
+    vue_hooker.ifMount(jq => jq.is('div.VueGamesRooms'), v => new GamesRooms(v, getFilter()));
+    vue_hooker.ifMount(jq => jq.is('div.VueGamesRoomsOne'), v => new GamesRoomsOne(v, getFilter(), state));
     vue_hooker.ifMount(jq => jq.is('div.GamesNewroom'), v => new GamesNewRoom(v, state));
     expmain(state);
     page_hooker.run();
@@ -11782,5 +11798,18 @@ catch (e) {
 }();
 /******/ })()
 ;
-            }
-        });
+          });
+        }
+
+        if ('JSWaterfall' in window) {
+          bootm1pro();
+        } else {
+          Object.defineProperty(window, "JSWaterfall", {
+            configurable: true,
+              set(v) {
+                Object.defineProperty(window, "JSWaterfall", { configurable: true, enumerable: true, writable: true, value: v });
+                bootm1pro();
+              }
+          });
+        }
+        

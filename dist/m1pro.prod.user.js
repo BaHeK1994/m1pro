@@ -5,7 +5,7 @@
               // ==UserScript==
 // @name        m1pro
 // @namespace   https://alexdymov.github.io/m1pro
-// @version     1.0.2a
+// @version     1.0.3a
 // @author      Smoke <alex.dymov@gmail.com>
 // @source      https://github.com/alexdymov/m1pro
 // @match       https://monopoly-one.com/*
@@ -7596,6 +7596,12 @@ class MarketListingReq extends MReq {
         this.offset = offset;
     }
 }
+class MarketBestPriceReq extends (/* unused pure expression or super */ null && (MReq)) {
+    constructor(thing_prototype_id) {
+        super();
+        this.thing_prototype_id = thing_prototype_id;
+    }
+}
 class FriendsGetReq extends MReq {
     constructor(online = [], add_user_info = [], user_id = []) {
         super();
@@ -10502,6 +10508,123 @@ GamesFilter = games_filter_decorate([
 ], GamesFilter);
 /* harmony default export */ var games_filter = (GamesFilter);
 
+;// CONCATENATED MODULE: ./node_modules/p-throttle/index.js
+class AbortError extends Error {
+  constructor() {
+    super('Throttled function aborted');
+    this.name = 'AbortError';
+  }
+
+}
+function pThrottle({
+  limit,
+  interval,
+  strict
+}) {
+  if (!Number.isFinite(limit)) {
+    throw new TypeError('Expected `limit` to be a finite number');
+  }
+
+  if (!Number.isFinite(interval)) {
+    throw new TypeError('Expected `interval` to be a finite number');
+  }
+
+  const queue = new Map();
+  let currentTick = 0;
+  let activeCount = 0;
+
+  function windowedDelay() {
+    const now = Date.now();
+
+    if (now - currentTick > interval) {
+      activeCount = 1;
+      currentTick = now;
+      return 0;
+    }
+
+    if (activeCount < limit) {
+      activeCount++;
+    } else {
+      currentTick += interval;
+      activeCount = 1;
+    }
+
+    return currentTick - now;
+  }
+
+  const strictTicks = [];
+
+  function strictDelay() {
+    const now = Date.now();
+
+    if (strictTicks.length < limit) {
+      strictTicks.push(now);
+      return 0;
+    }
+
+    const earliestTime = strictTicks.shift() + interval;
+
+    if (now >= earliestTime) {
+      strictTicks.push(now);
+      return 0;
+    }
+
+    strictTicks.push(earliestTime);
+    return earliestTime - now;
+  }
+
+  const getDelay = strict ? strictDelay : windowedDelay;
+  return function_ => {
+    const throttled = function (...args) {
+      if (!throttled.isEnabled) {
+        return (async () => function_.apply(this, args))();
+      }
+
+      let timeout;
+      return new Promise((resolve, reject) => {
+        const execute = () => {
+          resolve(function_.apply(this, args));
+          queue.delete(timeout);
+        };
+
+        timeout = setTimeout(execute, getDelay());
+        queue.set(timeout, reject);
+      });
+    };
+
+    throttled.abort = () => {
+      for (const timeout of queue.keys()) {
+        clearTimeout(timeout);
+        queue.get(timeout)(new AbortError());
+      }
+
+      queue.clear();
+      strictTicks.splice(0, strictTicks.length);
+    };
+
+    throttled.isEnabled = true;
+    return throttled;
+  };
+}
+;// CONCATENATED MODULE: ./src/util/http-util.ts
+const handleResponse = (resolve, callable) => {
+    return (res) => {
+        const def = $.Deferred();
+        if (res.code) {
+            if (res.code === 8) {
+                return window.require.async('/js/vuem/Captcha.js').then(() => {
+                    return window._libs.dialog.show({ component: "captcha", buttons: [{ is_default: true, title: "Отмена" }] })
+                        .then((tkn) => callable(tkn));
+                });
+            }
+            return def.reject(res);
+        }
+        else {
+            return def.resolve(res.data).then(resolve);
+        }
+    };
+};
+
 ;// CONCATENATED MODULE: ./src/util/prop-def.ts
 const propDefinedWindow = (name) => {
     return propDefined(window, name);
@@ -10537,25 +10660,6 @@ const propWait = (obj, name, timeoutms = 3000) => {
     });
 };
 
-;// CONCATENATED MODULE: ./src/util/http-util.ts
-const handleResponse = (resolve, callable) => {
-    return (res) => {
-        const def = $.Deferred();
-        if (res.code) {
-            if (res.code === 8) {
-                return window.require.async('/js/vuem/Captcha.js').then(() => {
-                    return window._libs.dialog.show({ component: "captcha", buttons: [{ is_default: true, title: "Отмена" }] })
-                        .then((tkn) => callable(tkn));
-                });
-            }
-            return def.reject(res);
-        }
-        else {
-            return def.resolve(res.data).then(resolve);
-        }
-    };
-};
-
 ;// CONCATENATED MODULE: ./src/components/main-state.ts
 var main_state_decorate = (undefined && undefined.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
@@ -10563,6 +10667,7 @@ var main_state_decorate = (undefined && undefined.__decorate) || function (decor
     else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
     return c > 3 && r && Object.defineProperty(target, key, r), r;
 };
+
 
 
 
@@ -10583,8 +10688,14 @@ let MainState = class MainState extends (external_Vue_default()) {
         this.itemPrices = new Map();
         this.lastSeen = localStorage.getItem('last_pro_version_seen') || '0';
         this.gamesNewSettings = null;
-        this.ver = "1.0.2a";
+        this.ver = "1.0.3a";
         this.listeners = new Map();
+        this.throttler = pThrottle({ limit: 1, interval: 200 });
+    }
+    post(url, data) {
+        const def = $.Deferred();
+        this.throttler(() => $.post(url, data).then(val => def.resolve(val)).fail(e => def.reject(e)))();
+        return def.promise();
     }
     created() {
         const localSettings = localStorage.getItem('games_new_settings');
@@ -10638,7 +10749,7 @@ let MainState = class MainState extends (external_Vue_default()) {
         localStorage.setItem('last_pro_version_seen', this.ver);
     }
     loadLots() {
-        $.post('/api/market.getMyLots', new MarketLotsReq())
+        this.post('/api/market.getMyLots', new MarketLotsReq())
             .then((res) => {
             if (res.code) {
                 throw res;
@@ -10648,47 +10759,43 @@ let MainState = class MainState extends (external_Vue_default()) {
             }
         }).fail(err => console.error(err));
     }
-    getSingleMarketListing(id) {
-        return $.post('/api/market.getListing', new MarketListingReq(id, 1))
+    getBestPrice(id) {
+        return this.post('/api/market.getBestPrice', new MarketListingReq(id, 1))
             .then((res) => {
-            var _a, _b;
-            const def = $.Deferred();
-            if (res.code || !((_b = (_a = res.data) === null || _a === void 0 ? void 0 : _a.things) === null || _b === void 0 ? void 0 : _b.length)) {
-                return def.reject(res);
+            if (res.code) {
+                throw res;
             }
             else {
-                return def.resolve(res.data.things[0]);
+                return res.data.price;
             }
         });
     }
     getUserInfo(id, ids = [], type) {
-        return $.post('/api/users.get', new UsersGetReq(type, id, ids.length ? ids.join(',') : ids))
+        return this.post('/api/users.get', new UsersGetReq(type, id, ids.length ? ids.join(',') : ids))
             .then((res) => {
             var _a;
-            const def = $.Deferred();
             if (res.code || !((_a = res.data) === null || _a === void 0 ? void 0 : _a.length)) {
-                return def.reject(res);
+                throw res;
             }
             else {
-                return def.resolve(res.data);
+                return res.data;
             }
         });
     }
     getFriends(req) {
-        return $.post('/api/friends.get', req)
+        return this.post('/api/friends.get', req)
             .then((res) => {
-            const def = $.Deferred();
             if (res.code) {
-                return def.reject(res);
+                throw res;
             }
             else {
-                return def.resolve(res.data);
+                return res.data;
             }
         });
     }
     getItemPrice(id) {
         if (!this.itemPrices.has(id)) {
-            this.itemPrices.set(id, this.getSingleMarketListing(`${id}`).then(thing => thing.price));
+            this.itemPrices.set(id, this.getBestPrice(`${id}`));
         }
         return this.itemPrices.get(id);
     }
@@ -10696,7 +10803,7 @@ let MainState = class MainState extends (external_Vue_default()) {
         return version.localeCompare(this.lastSeen, undefined, { numeric: true, sensitivity: 'base' }) > 0;
     }
     changeSetting(roomId, name, value, token) {
-        return $.post('/api/rooms.settingsChange', new RoomsChangeSettings(roomId, name, value).withCaptcha(token))
+        return this.post('/api/rooms.settingsChange', new RoomsChangeSettings(roomId, name, value).withCaptcha(token))
             .then(handleResponse(() => true, tkn => this.changeSetting(roomId, name, value, tkn)))
             .fail(e => console.error('failed to change setting', name, 'code', e));
     }
@@ -10753,7 +10860,7 @@ class CollapseBlock {
 
 ;// CONCATENATED MODULE: ./CHANGELOG.md
 // Module
-var code = "<h2>m1pro Release History</h2> <h4>21-Nov-2022 - <strong>1.0.2</strong></h4> <p>Исправлена инициализация расширения после обновления сайта.</p> <p>Другое:</p> <ul> <li>Исправлена недоступность обновления для браузера Mozilla Firefox.</li> <li>Исправлены кнопки на банерах.</li> </ul> <h4>11-Jul-2022 - <strong>1.0.1</strong></h4> <p>Количество установок из Chrome Web Store перевалило за тысячу! В связи с этим хотелось бы порадовать вас небольшим обновлением.</p> <p>Другое:</p> <ul> <li>Добалено: ссылка на Discord сообщество, ссылка на Google форму для сбора обратной связи и блок для пожертвований в окно информации о расширении. <blockquote> <p>Проект существует на безвозмездной основе и энтузиазме разработчика, но любая разработка требует времени, которое есть не всегда ввиду личных обстоятельств. Также в проекте не задействована реклама (и не будет), но некоторые вещи требуют расходов. Например, было несколько предложений, которые требуют для реализации наличия серверной составляющей, или публикация расширения в магазине для Safari на iPhone требует платной учетной записи разработчика. Чтобы сделать такие функции возможными в будущем, а также повысить мотивацию активно заниматься данным проектом, мы запускаем сбор пожертвований на развитие проекта.</p> </blockquote> </li> <li>Добавлен банер на главную страницу. <blockquote> <p>Банер можно скрыть навсегда, если мешает. Кнопка появится после нажатия \"Показать как\".</p> </blockquote> </li> <li>Исправлено: неверное позиционирование оповещения о приглашении в игру, найденном матче и тд.</li> </ul> <p>Игра:</p> <ul> <li>Добавлен счетик дублей и оставшихся бросков до выхода из тюрьмы на фишке игрока.</li> <li>Улучшено: раскрыты случайные значения вариантов поля \"Шанс\".</li> <li>Улучшено: при рестартах выключенные поля включаются снова.</li> <li>Улучшено: отображение подсветки полей перехода по кубику М1 не показывается при попадании в тюрьму.</li> <li>Улучшено: включено отображение подсветки полей перехода при выборе поля после броска с автобусом или триплом.</li> <li>Улучшено: отображение подсветки полей перехода не отображается при обычных бросках из тюрьмы (переход отобразится только при бросках, которые приводят к выходу из тюрьмы).</li> <li>Улучшено: убраны приписки \"k\" возле цен в чате игры.</li> <li>Исправлено: при рестартах не обновлялись варианты поля \"Шанс\".</li> <li>Исправлено: цена выхода из тюрьмы не учитывалась в расходах.</li> <li>Исправлено: эффект \"Пропуск хода\" не исчезал на нужном раунде в некоторых случаях.</li> </ul> <h4>22-Apr-2022 - <strong>1.0.0</strong></h4> <p>Игра:</p> <ul> <li>Добавлено отображение оставшихся вариантов попадания на поле \"Шанс\" в дополнительном блоке справа.</li> <li>Добавлена подсветка полей при ходе любого игрока, полей при перемещении по М1, а также доступного выбора из нескольких вариантов. Доступные варианты хода чужих телепортов тоже подсвечиваются.</li> <li>Добавлено отображение чужих договоров в live режиме (можно отключить в настройках) и список всех договоров в течение игры.</li> <li>Добавлено отображение выпавшего варианта при попадании на поле \"Шанс\".</li> <li>Добавлена настройка для возможности отключения функции \"Свой цвет всегда красный\".</li> <li>Улучшена общая статистика игры в дополнительном блоке справа, а также добавлена информация о следующем модификаторе прохода круга и оставшееся до его примения время.</li> <li>В окно договора добавлены кнопки для корректировки двойной цены в обе стороны.</li> <li>Кроме кнопки постройки филиала добавлены также кнопки для уменьшения уровня, заклада, выкупа, в том числе две специальные кнопки: перезаклад (для всех режимов) и быстрая постройка (доступна только на втором раунде режима \"Расклад\").</li> <li>Любое свободное поле можно отметить как \"выключенное\" (отмечается серым цветом). Выключенные поля это такие поля, которые вы не хотите покупать. При попадании на такое поле оно будет автоматически выставляться на аукцион, аналогично, при предложении покупки такого поля на аукционе будет отклоняться автоматически.</li> <li>Добавлено отображение эффектов \"Пропуск хода\" и \"Ход назад\" на фишке игрока.</li> </ul> <p>Другое:</p> <ul> <li>Исправлен редкий баг, при котором не отображалось подтверждение принятия матча в соревновательном режиме.</li> <li>Исправлена страница профиля.</li> <li>Цены на предметах в инвентаре теперь отображаются корректно при сортировке и фильтрах.</li> <li>Для отображения ранга теперь используются стандартные картинки из игры.</li> <li>Возвращено отображение кнопок игнора и подачи жалобы на игрока, который уже проиграл.</li> </ul> <h4>19-Dec-2021 - <strong>0.3.1</strong></h4> <p>Игра:</p> <ul> <li>В интерфейс договора добавлена информация о требуемой оплате текущих расходов. <blockquote> <p>Данная информация включает сумму требуемую для оплаты, а также состояние (нехватка или остаток) после оплаты текущих расходов с учетом оформляемого договора как без учета полей в наличии (только на основе имеющихся денег), так и с учетом стоимости заклада полей.</p> </blockquote> </li> </ul> <p>Другое:</p> <ul> <li>Исправлено множество ошибок связанных с обновлением сайта.</li> </ul> <h4>30-Nov-2021 - <strong>0.3.0</strong></h4> <p>Игра:</p> <ul> <li>Добавлена кнопка рядом с каждым полем для постройки филиала.</li> <li>В интерфейс договора добавлена кнопка для уравнения общей суммы.</li> <li>Исправлено отображение статуса кредита.</li> <li>Добавлено отображение доходов и расходов в дополнительной информации каждого игрока.</li> </ul> <h4>21-Nov-2021 - <strong>0.2.1</strong></h4> <p>Игра:</p> <ul> <li>Добавлена настройка \"Показывать общую статистику в отдельном блоке\"</li> </ul> <h4>20-Nov-2021 - <strong>0.2.0</strong></h4> <p>Игра:</p> <ul> <li>Общая статистка игры (тип и время игры, количество зрителей, раунд и круговой доход) теперь выводится в дополнительном блоке справа. <blockquote> <p>Данный блок доступен при достаточной ширине видимой области страницы, если ширины недостаточно, то статистика доступна как и раньше, по клику на <strong>ion-chevron-up</strong></p> </blockquote> </li> <li>Детальная статистика игры дополнена количеством пройденных кругов и прибылью для каждого игрока. <blockquote> <p>Прибылью является разница между полученными и утраченными активами, которые не зависят от приобретенных полей других игроков, например, проход круга, победа в конкурсе красоты, оплата налогов, ставки на рулетку, джекпот или открытие портала, затраты на выход из тюрьмы, получение и возврат кредита и тд. Зеленый цвет означает положительную прибыль, а красный отрицательную. При наведении на прибыль можно увидеть подробные значения полученных и утраченных активов.</p> </blockquote> </li> <li>В карточке игрока добавлена информация: рейтинг, предыдущие баны MFP, пол, статус дружбы.</li> <li>При наведении на <strong>ion-plus-circled</strong> в карточке игрока добавлен вывод информации: счет, количество игр/побед, процент побед.</li> <li>Включено отображение стоимости полей, которые можно заложить, для всех режимов (<strong>ion-ios-cart</strong> в карточке игрока).</li> <li>Для режима 2 на 2 добавлено отображение свободных активов команды (<strong>ion-ios-cart</strong> в блоке между командами). Свободные активы включают деньги обоих игроков и поля, которые можно передать.</li> </ul> <p>Другое:</p> <ul> <li>Добавлена информация об игре и расширении.</li> <li>Чат: добавлена возможность показать скрытые ранее сообщения (в настройках), а у скрытых сообщений появилась возможность убрать игнор.</li> <li>Поиск игр: добавлено определение кто у кого находится в друзьях в созданной игре. <blockquote> <p>В иконках у игрока появляется <strong>ion-person-stalker</strong> с цветом того игрока, другом которого он является.</p> </blockquote> </li> <li>Поиск игр: добавлен вывод забаненых <strong>ion-ios-close</strong> и приглашенных игроков <strong>ion-person-add</strong> в созданной игре.</li> <li>Создание новой игры: добавлено сохранение выбранных настроек при создании игровой комнаты. <blockquote> <p>Сохраняемые настройки включают последний выбранный режим игры, список выбранных режимов для соревновательной игры, а так же следующие опции для каждого режима по отдельности:</p> <ul> <li>Количество игроков.</li> <li>Приватная комната.</li> <li>Автостарт игры.</li> <li>Рестарты (при выборе 2 на 2 в быстрой игре).</li> <li>Таймеры.</li> <li>Угловое поле.</li> </ul> </blockquote> </li> </ul> <h4>07-Nov-2021 - <strong>0.1.3</strong></h4> <ul> <li>Косметические исправления для списка друзей и главной страницы.</li> </ul> <h4>05-Nov-2021 - <strong>0.1.2</strong></h4> <ul> <li>First alpha release.</li> </ul> ";
+var code = "<h2>m1pro Release History</h2> <h4>15-Jan-2023 - <strong>1.0.3</strong></h4> <p>Другое:</p> <ul> <li>Исправлено: возвращен фильтр созданных комнат</li> <li>Исправлено: принято во внимание ограничение одновременных запросов при загрузке цен на предметы инвентаря, теперь цены загружаются все, но постепенно</li> </ul> <h4>21-Nov-2022 - <strong>1.0.2</strong></h4> <p>Исправлена инициализация расширения после обновления сайта.</p> <p>Другое:</p> <ul> <li>Исправлена недоступность обновления для браузера Mozilla Firefox.</li> <li>Исправлены кнопки на банерах.</li> </ul> <h4>11-Jul-2022 - <strong>1.0.1</strong></h4> <p>Количество установок из Chrome Web Store перевалило за тысячу! В связи с этим хотелось бы порадовать вас небольшим обновлением.</p> <p>Другое:</p> <ul> <li>Добалено: ссылка на Discord сообщество, ссылка на Google форму для сбора обратной связи и блок для пожертвований в окно информации о расширении. <blockquote> <p>Проект существует на безвозмездной основе и энтузиазме разработчика, но любая разработка требует времени, которое есть не всегда ввиду личных обстоятельств. Также в проекте не задействована реклама (и не будет), но некоторые вещи требуют расходов. Например, было несколько предложений, которые требуют для реализации наличия серверной составляющей, или публикация расширения в магазине для Safari на iPhone требует платной учетной записи разработчика. Чтобы сделать такие функции возможными в будущем, а также повысить мотивацию активно заниматься данным проектом, мы запускаем сбор пожертвований на развитие проекта.</p> </blockquote> </li> <li>Добавлен банер на главную страницу. <blockquote> <p>Банер можно скрыть навсегда, если мешает. Кнопка появится после нажатия \"Показать как\".</p> </blockquote> </li> <li>Исправлено: неверное позиционирование оповещения о приглашении в игру, найденном матче и тд.</li> </ul> <p>Игра:</p> <ul> <li>Добавлен счетик дублей и оставшихся бросков до выхода из тюрьмы на фишке игрока.</li> <li>Улучшено: раскрыты случайные значения вариантов поля \"Шанс\".</li> <li>Улучшено: при рестартах выключенные поля включаются снова.</li> <li>Улучшено: отображение подсветки полей перехода по кубику М1 не показывается при попадании в тюрьму.</li> <li>Улучшено: включено отображение подсветки полей перехода при выборе поля после броска с автобусом или триплом.</li> <li>Улучшено: отображение подсветки полей перехода не отображается при обычных бросках из тюрьмы (переход отобразится только при бросках, которые приводят к выходу из тюрьмы).</li> <li>Улучшено: убраны приписки \"k\" возле цен в чате игры.</li> <li>Исправлено: при рестартах не обновлялись варианты поля \"Шанс\".</li> <li>Исправлено: цена выхода из тюрьмы не учитывалась в расходах.</li> <li>Исправлено: эффект \"Пропуск хода\" не исчезал на нужном раунде в некоторых случаях.</li> </ul> <h4>22-Apr-2022 - <strong>1.0.0</strong></h4> <p>Игра:</p> <ul> <li>Добавлено отображение оставшихся вариантов попадания на поле \"Шанс\" в дополнительном блоке справа.</li> <li>Добавлена подсветка полей при ходе любого игрока, полей при перемещении по М1, а также доступного выбора из нескольких вариантов. Доступные варианты хода чужих телепортов тоже подсвечиваются.</li> <li>Добавлено отображение чужих договоров в live режиме (можно отключить в настройках) и список всех договоров в течение игры.</li> <li>Добавлено отображение выпавшего варианта при попадании на поле \"Шанс\".</li> <li>Добавлена настройка для возможности отключения функции \"Свой цвет всегда красный\".</li> <li>Улучшена общая статистика игры в дополнительном блоке справа, а также добавлена информация о следующем модификаторе прохода круга и оставшееся до его примения время.</li> <li>В окно договора добавлены кнопки для корректировки двойной цены в обе стороны.</li> <li>Кроме кнопки постройки филиала добавлены также кнопки для уменьшения уровня, заклада, выкупа, в том числе две специальные кнопки: перезаклад (для всех режимов) и быстрая постройка (доступна только на втором раунде режима \"Расклад\").</li> <li>Любое свободное поле можно отметить как \"выключенное\" (отмечается серым цветом). Выключенные поля это такие поля, которые вы не хотите покупать. При попадании на такое поле оно будет автоматически выставляться на аукцион, аналогично, при предложении покупки такого поля на аукционе будет отклоняться автоматически.</li> <li>Добавлено отображение эффектов \"Пропуск хода\" и \"Ход назад\" на фишке игрока.</li> </ul> <p>Другое:</p> <ul> <li>Исправлен редкий баг, при котором не отображалось подтверждение принятия матча в соревновательном режиме.</li> <li>Исправлена страница профиля.</li> <li>Цены на предметах в инвентаре теперь отображаются корректно при сортировке и фильтрах.</li> <li>Для отображения ранга теперь используются стандартные картинки из игры.</li> <li>Возвращено отображение кнопок игнора и подачи жалобы на игрока, который уже проиграл.</li> </ul> <h4>19-Dec-2021 - <strong>0.3.1</strong></h4> <p>Игра:</p> <ul> <li>В интерфейс договора добавлена информация о требуемой оплате текущих расходов. <blockquote> <p>Данная информация включает сумму требуемую для оплаты, а также состояние (нехватка или остаток) после оплаты текущих расходов с учетом оформляемого договора как без учета полей в наличии (только на основе имеющихся денег), так и с учетом стоимости заклада полей.</p> </blockquote> </li> </ul> <p>Другое:</p> <ul> <li>Исправлено множество ошибок связанных с обновлением сайта.</li> </ul> <h4>30-Nov-2021 - <strong>0.3.0</strong></h4> <p>Игра:</p> <ul> <li>Добавлена кнопка рядом с каждым полем для постройки филиала.</li> <li>В интерфейс договора добавлена кнопка для уравнения общей суммы.</li> <li>Исправлено отображение статуса кредита.</li> <li>Добавлено отображение доходов и расходов в дополнительной информации каждого игрока.</li> </ul> <h4>21-Nov-2021 - <strong>0.2.1</strong></h4> <p>Игра:</p> <ul> <li>Добавлена настройка \"Показывать общую статистику в отдельном блоке\"</li> </ul> <h4>20-Nov-2021 - <strong>0.2.0</strong></h4> <p>Игра:</p> <ul> <li>Общая статистка игры (тип и время игры, количество зрителей, раунд и круговой доход) теперь выводится в дополнительном блоке справа. <blockquote> <p>Данный блок доступен при достаточной ширине видимой области страницы, если ширины недостаточно, то статистика доступна как и раньше, по клику на <strong>ion-chevron-up</strong></p> </blockquote> </li> <li>Детальная статистика игры дополнена количеством пройденных кругов и прибылью для каждого игрока. <blockquote> <p>Прибылью является разница между полученными и утраченными активами, которые не зависят от приобретенных полей других игроков, например, проход круга, победа в конкурсе красоты, оплата налогов, ставки на рулетку, джекпот или открытие портала, затраты на выход из тюрьмы, получение и возврат кредита и тд. Зеленый цвет означает положительную прибыль, а красный отрицательную. При наведении на прибыль можно увидеть подробные значения полученных и утраченных активов.</p> </blockquote> </li> <li>В карточке игрока добавлена информация: рейтинг, предыдущие баны MFP, пол, статус дружбы.</li> <li>При наведении на <strong>ion-plus-circled</strong> в карточке игрока добавлен вывод информации: счет, количество игр/побед, процент побед.</li> <li>Включено отображение стоимости полей, которые можно заложить, для всех режимов (<strong>ion-ios-cart</strong> в карточке игрока).</li> <li>Для режима 2 на 2 добавлено отображение свободных активов команды (<strong>ion-ios-cart</strong> в блоке между командами). Свободные активы включают деньги обоих игроков и поля, которые можно передать.</li> </ul> <p>Другое:</p> <ul> <li>Добавлена информация об игре и расширении.</li> <li>Чат: добавлена возможность показать скрытые ранее сообщения (в настройках), а у скрытых сообщений появилась возможность убрать игнор.</li> <li>Поиск игр: добавлено определение кто у кого находится в друзьях в созданной игре. <blockquote> <p>В иконках у игрока появляется <strong>ion-person-stalker</strong> с цветом того игрока, другом которого он является.</p> </blockquote> </li> <li>Поиск игр: добавлен вывод забаненых <strong>ion-ios-close</strong> и приглашенных игроков <strong>ion-person-add</strong> в созданной игре.</li> <li>Создание новой игры: добавлено сохранение выбранных настроек при создании игровой комнаты. <blockquote> <p>Сохраняемые настройки включают последний выбранный режим игры, список выбранных режимов для соревновательной игры, а так же следующие опции для каждого режима по отдельности:</p> <ul> <li>Количество игроков.</li> <li>Приватная комната.</li> <li>Автостарт игры.</li> <li>Рестарты (при выборе 2 на 2 в быстрой игре).</li> <li>Таймеры.</li> <li>Угловое поле.</li> </ul> </blockquote> </li> </ul> <h4>07-Nov-2021 - <strong>0.1.3</strong></h4> <ul> <li>Косметические исправления для списка друзей и главной страницы.</li> </ul> <h4>05-Nov-2021 - <strong>0.1.2</strong></h4> <ul> <li>First alpha release.</li> </ul> ";
 // Exports
 /* harmony default export */ var CHANGELOG = (code);
 // EXTERNAL MODULE: ./node_modules/css-loader/dist/cjs.js!./node_modules/less-loader/dist/cjs.js!./src/style/info.less
@@ -10804,7 +10911,7 @@ const opts = {
             <div class="Info-content">
                 <div class="Info-main" :class='{selected: !showPro}'></div>
                 <div class="Info-pro" :class='{selected: showPro}'>
-                    <div class="Info-pro-head">Текущая версия: ${"1.0.2a"}</div>
+                    <div class="Info-pro-head">Текущая версия: ${"1.0.3a"}</div>
                     <div class="Info-pro-general">
                             <div class="_community">
                                 Сообщество для обсуждения: 
@@ -10899,7 +11006,7 @@ const opts = {
         this.state.$watch('lastSeen', () => {
             jq.find('div.badge').hide();
         });
-        if (this.state.isUnseen("1.0.2a")) {
+        if (this.state.isUnseen("1.0.3a")) {
             jq.find('div.badge').show();
             jq.find('div.Info-pro-history h4 > strong').each((i, el) => {
                 const jel = jQuery(el);
@@ -11006,7 +11113,7 @@ class HeaderMenu {
         return jQuery(`.header-menu a[href="/${link}"] span`).clone();
     }
     checkVersion() {
-        this.state.isUnseen("1.0.2a") ? this.verBadge.show() : this.verBadge.hide();
+        this.state.isUnseen("1.0.3a") ? this.verBadge.show() : this.verBadge.hide();
     }
 }
 
@@ -11177,15 +11284,24 @@ class item_Item {
     init(item) {
         __webpack_require__("./src/style/main/item.less");
         // debug(JSON.parse(JSON.stringify(item)));
-        const mark = jQuery('<div class="_flex _mark ion-ios-cart" />');
+        const mark = jQuery('<div class="_flex _mark ion-ios-cart"><span>...</span></div>');
         this.jq.find('div._left').find('div._mark.ion-ios-cart').remove().end().append(mark);
         this.base.$watch('item', it => {
             var _a;
-            this.state.getItemPrice((_a = it.item_proto_id) !== null && _a !== void 0 ? _a : it.thing_prototype_id).then(price => mark.children().remove().end().append(`<span>${price}</span>`));
+            const id = (_a = it.item_proto_id) !== null && _a !== void 0 ? _a : it.thing_prototype_id;
+            this.state.getItemPrice(id)
+                .then(price => {
+                if (price === null) {
+                    mark.hide();
+                }
+                else {
+                    mark.css('display', 'flex').children().remove().end().append(`<span>${price}</span>`);
+                }
+            })
+                .fail(e => mark.css('color', '#da4553'));
             if (item.user_id === window.API.user.user_id) {
                 this.state.lots.things.some(lot => {
-                    var _a;
-                    if (lot.thing_prototype_id === ((_a = item.item_proto_id) !== null && _a !== void 0 ? _a : item.thing_prototype_id)) {
+                    if (lot.thing_prototype_id === id) {
                         mark.css('color', 'green');
                         return true;
                     }
@@ -11539,7 +11655,7 @@ class Profile {
             .appendTo(ctr);
     }
     loadInventoryItems(user_id) {
-        $.post('/api/inventory.get', new InventoryGetReq(user_id))
+        this.state.post('/api/inventory.get', new InventoryGetReq(user_id))
             .then((res) => {
             if (res.code) {
                 throw res;

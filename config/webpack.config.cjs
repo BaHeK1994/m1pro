@@ -25,6 +25,32 @@ function createConfig(options) {
   ];
 
   const entry = './src/index.ts';
+  const wrapper = {
+    header: `
+    function bootm1pro() {
+      _require.async("//cdn.jsdelivr.net/npm/vue@2.6.10/dist/vue.min.js").then(vv => {
+        console.debug('vue set', typeof window.Vue);
+        window.Vue = vv;
+          `,
+    footer: `
+      });
+    }
+
+    if ('JSWaterfall' in window) {
+      console.debug('have waterfall')
+      bootm1pro();
+    } else {
+      Object.defineProperty(window, "JSWaterfall", {
+        configurable: true,
+          set(v) {
+            console.debug('waterfall set')
+            Object.defineProperty(window, "JSWaterfall", { configurable: true, enumerable: true, writable: true, value: v });
+            bootm1pro();
+          }
+      });
+    }
+    `
+  }
 
   let tcfg;
   if (options.target === 'user') {
@@ -36,27 +62,7 @@ function createConfig(options) {
 
     plugins.push(new WrapperPlugin({
       test: new RegExp(`${filename}$`),
-      header: `
-        function bootm1pro() {
-          _require.async("//cdn.jsdelivr.net/npm/vue@2.6.10/dist/vue.min.js").then(vv => {
-            window.Vue = vv;
-              `,
-      footer: `
-          });
-        }
-
-        if ('JSWaterfall' in window) {
-          bootm1pro();
-        } else {
-          Object.defineProperty(window, "JSWaterfall", {
-            configurable: true,
-              set(v) {
-                Object.defineProperty(window, "JSWaterfall", { configurable: true, enumerable: true, writable: true, value: v });
-                bootm1pro();
-              }
-          });
-        }
-        `
+      ...wrapper
     }));
 
     if (options.prod) {
@@ -92,32 +98,7 @@ function createConfig(options) {
     // to use with webpack 5+ and wrapper 2.2- do apply https://github.com/levp/wrapper-webpack-plugin/pull/16
     plugins.push(new WrapperPlugin({
       test: /\.js$/,
-      header: `var scriptCode = '(' + function() {
-        function bootm1pro() {
-          _require.async("//cdn.jsdelivr.net/npm/vue@2.6.10/dist/vue.min.js").then(vv => {
-            window.Vue = vv;
-      `,
-      footer: `
-          });
-        }
-
-        if ('JSWaterfall' in window) {
-          bootm1pro();
-        } else {
-          Object.defineProperty(window, "JSWaterfall", {
-            configurable: true,
-              set(v) {
-                Object.defineProperty(window, "JSWaterfall", { configurable: true, enumerable: true, writable: true, value: v });
-                bootm1pro();
-              }
-          });
-        }
-        } + ')();';
-        var script = document.createElement('script');
-        script.textContent = scriptCode;
-        (document.head||document.documentElement).appendChild(script);
-        script.remove();
-        `
+      ...wrapper
     }));
     plugins.push(new CopyPlugin({
       patterns: [{
@@ -148,6 +129,9 @@ function createConfig(options) {
     watch: true,
     watchOptions: {
       ignored: /node_modules/,
+    },
+    stats: {
+      errorDetails: true
     }
   };
   return merge(webpackConfig, tcfg, pcfg, { mode, plugins });

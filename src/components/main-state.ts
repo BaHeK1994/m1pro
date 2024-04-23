@@ -44,44 +44,52 @@ export default class MainState extends Vue {
         this.$watch('gamesNewSettings', (v) => {
             localStorage.setItem('games_new_settings', JSON.stringify(this.gamesNewSettings));
         }, { deep: true });
-        if (window.API && window.API.isUserSignedIn()) {
-            this.loadLots();
+        if (window.API) {
+            this.firstInit();
         } else {
-            propWaitWindow('API').then(v => {
-                const oldCallMethod = window.API.callMethod;
-                window.API.callMethod = (name, ...other) => {
-                    let fn: Function,
-                        data = {},
-                        a = {};
-                    switch (typeof other[0]) {
-                        case "function":
-                            [fn, a] = other;
-                            break;
-                        case "object":
-                            [data, fn, a] = other;
-                            break;
-                        case "undefined":
-                            break;
-                        default:
-                            throw new Error("Invalid params given.");
-                    }
-                    return oldCallMethod.call(window.API, name, data, (...data: any[]) => {
-                        fn && fn.apply(null, data);
-                        this.listeners.forEach((v, k) => {
-                            if (k === name) {
-                                if (v.apply(null, data)) {
-                                    this.listeners.delete(name);
-                                }
-                            }
-                        })
-                    }, a);
-                }
-                this.loadLots();
+            propWaitWindow('API').then(_ => {
+                this.firstInit();
             });
         }
         setInterval(() => {
-            this.loadLots();
+            window.API.isUserSignedIn() && this.loadLots();
         }, 60 * 1000);
+    }
+
+    private firstInit() {
+        this.rebindAPI();
+        window.API.isUserSignedIn() && this.loadLots();
+    }
+
+    private rebindAPI() {
+        const oldCallMethod = window.API.callMethod;
+        window.API.callMethod = (name, ...other) => {
+            let fn: Function,
+                data = {},
+                a = {};
+            switch (typeof other[0]) {
+                case "function":
+                    [fn, a] = other;
+                    break;
+                case "object":
+                    [data, fn, a] = other;
+                    break;
+                case "undefined":
+                    break;
+                default:
+                    throw new Error("Invalid params given.");
+            }
+            return oldCallMethod.call(window.API, name, data, (...data: any[]) => {
+                fn && fn.apply(null, data);
+                this.listeners.forEach((v, k) => {
+                    if (k === name) {
+                        if (v.apply(null, data)) {
+                            this.listeners.delete(name);
+                        }
+                    }
+                })
+            }, a);
+        }
     }
 
     onCallMethod(name: string, fn: (data: any) => boolean) {

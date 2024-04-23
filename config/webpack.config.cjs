@@ -15,6 +15,7 @@ const { version, description, name } = require('../package.json');
 
 const webpackConfig = require('./webpack.config.base.cjs');
 const dist = rpath.resolve(__dirname, '../dist');
+const TerserPlugin = require("terser-webpack-plugin");
 
 function createConfig(options) {
   const plugins = [
@@ -27,25 +28,20 @@ function createConfig(options) {
   const entry = './src/index.ts';
   const wrapper = {
     header: `
-    function bootm1pro() {
-      _require.async("//cdn.jsdelivr.net/npm/vue@2.6.10/dist/vue.min.js").then(vv => {
-        console.debug('vue set', typeof window.Vue);
-        window.Vue = vv;
-          `,
+    function bootm1pro(wf) {
+      wf.run(() => {`,
     footer: `
       });
     }
 
-    if ('JSWaterfall' in window) {
-      console.debug('have waterfall')
-      bootm1pro();
+    if ('mainWaterfall' in window) {
+      bootm1pro(mainWaterfall);
     } else {
-      Object.defineProperty(window, "JSWaterfall", {
+      Object.defineProperty(window, "mainWaterfall", {
         configurable: true,
           set(v) {
-            console.debug('waterfall set')
-            Object.defineProperty(window, "JSWaterfall", { configurable: true, enumerable: true, writable: true, value: v });
-            bootm1pro();
+            Object.defineProperty(window, "mainWaterfall", { configurable: true, enumerable: true, writable: true, value: v });
+            bootm1pro(v);
           }
       });
     }
@@ -98,7 +94,14 @@ function createConfig(options) {
     // to use with webpack 5+ and wrapper 2.2- do apply https://github.com/levp/wrapper-webpack-plugin/pull/16
     plugins.push(new WrapperPlugin({
       test: /\.js$/,
-      ...wrapper
+      header: `var scriptCode = '(' + function() {
+        ` + wrapper.header,
+      footer: wrapper.footer + `
+        } + ')();';
+        var script = document.createElement('script');
+        script.textContent = scriptCode;
+        (document.head||document.documentElement).appendChild(script);
+        script.remove();`
     }));
     plugins.push(new CopyPlugin({
       patterns: [{
@@ -124,7 +127,16 @@ function createConfig(options) {
   }
 
   const mode = options.prod ? 'production' : 'development';
-  const pcfg = options.prod ? {} : {
+  const pcfg = options.prod ? {
+    optimization: {
+      minimize: true,
+      minimizer: [
+        new TerserPlugin({
+          extractComments: false,
+        }),
+      ],
+    }
+  } : {
     devtool: 'inline-source-map',
     watch: true,
     watchOptions: {
